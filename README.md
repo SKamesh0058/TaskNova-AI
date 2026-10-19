@@ -27,6 +27,6 @@ A conversation-based AI coordination assistant that converts messy team chats in
 - **AI Core:** Google Gemini API (Structured Outputs)
 - **Backend:** Python / FastAPI
 - **Frontend:** Responsive Web Interface (HTML, CSS, JavaScript)
-- ### contributors
+### contributors
 - @SKamesh0058
 
