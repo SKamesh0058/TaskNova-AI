@@ -33,3 +33,4 @@ A conversation-based AI coordination assistant that converts messy team chats in
 - @harshu121526
 - @abinav277
 - @Inykaash
+- @KarthikBalaje6212
