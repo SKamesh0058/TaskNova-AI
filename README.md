@@ -29,6 +29,6 @@ A conversation-based AI coordination assistant that converts messy team chats in
 - **Frontend:** Responsive Web Interface (HTML, CSS, JavaScript)
 ### contributors
 - @SKamesh0058
--@mithuhere26-ops
+- @mithuhere26-ops
 
 
