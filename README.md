@@ -1,5 +1,5 @@
 
-# TeamNova-AI
+# TaskNova-AI
 
 > **DEXATHON 2026** | Track 04: AI & Machine Learning | PS Category: Software
 
