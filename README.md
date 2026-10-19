@@ -28,10 +28,3 @@ A conversation-based AI coordination assistant that converts messy team chats in
 - **Backend:** Python / FastAPI
 - **Frontend:** Responsive Web Interface (HTML, CSS, JavaScript)
 
----
-
-### Project Roadmap
-- [x] Problem discovery & competitive analysis
-- [x] System architecture & JSON schema design
-- [ ] Core prototype implementation & API integration
-- [ ] Live demo deployment
