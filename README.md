@@ -30,5 +30,6 @@ A conversation-based AI coordination assistant that converts messy team chats in
 ### contributors
 - @SKamesh0058
 - @mithuhere26-ops
+- @harshu121526
 
 
