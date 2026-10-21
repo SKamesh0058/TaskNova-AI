@@ -9,6 +9,9 @@ A dual-input reconciliation engine that converts chat logs into structured task 
 ## Core Features
 
 * **Dual-Mode Workspace:** Switch between Student Mode for peer accountability and Office Mode for manager-led assignment.
+* **Persistent Project Scope:** Maintain a permanent master scope checklist with built-in editing capabilities while adding new chat transcripts iteratively.
+* **Smart Roster Parsing:** Automatically extracts clean team member names from uploaded roster documents while ignoring registration numbers, dates, and serial numbers.
+* **Duplicate Filtering:** Automatically detects and ignores repeated chat entries to keep reconciliation clean.
 * **Verbatim Quote Auditing:** Binds every task card to its source chat message for complete accountability.
 * **Local-First Persistence:** Uses browser local storage and portable session files with zero cloud database overhead.
 * **Automated Risk Detection:** Flags unassigned roles and missing deadlines.
@@ -20,7 +23,7 @@ A dual-input reconciliation engine that converts chat logs into structured task 
 
 1. **Ingestion:** Upload master scope checklists and raw chat transcripts.
 2. **Backend:** Python 3.11 and FastAPI for preprocessing and filtering.
-3. **AI Core:** Google Gemini 2.5 Pro via Python SDK with strict Pydantic schema validation.
+3. **Core Processing:** Google Gemini 2.5 Pro via Python SDK with strict schema validation.
 4. **Frontend:** Vanilla JavaScript, Tailwind CSS, and export handlers.
 
 ---
