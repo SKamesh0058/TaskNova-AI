@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskNova-AI ✨ | Standalone Prototype (DEX262092)</title>
+
+    <!-- Standalone Browser Engines: Excel, Word, PDF, Image OCR (Tesseract.js), PDF/JPEG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: #131b2e;
+            --bg-panel: #19233c;
+            --indigo: #6366f1;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --crimson: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #263554;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 16px;
+            line-height: 1.4;
+        }
+
+        /* VIBRANT SKETCH HEADER LAYOUT */
+        .header {
+            background: linear-gradient(135deg, #131b2e, #1a233a);
+            border: 1px solid var(--border);
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-area {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .brand-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #818cf8, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .compact-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .mode-buttons-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            color: var(--text-main);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--cyan);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--indigo), var(--cyan));
+            border: none;
+            color: #fff;
+        }
+
+        .btn-demo {
+            background: #1e293b;
+            border-color: var(--indigo);
+            color: #a5b4fc;
+        }
+
+        .mode-btn {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--bg-dark);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--indigo), var(--cyan));
+            color: #fff;
+            border: none;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* INTERACTIVE MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--indigo);
+            border-radius: 14px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 3 INPUT CARDS GRID */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subtext {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .instruction-box {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--cyan);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.77rem;
+            color: #a5f3fc;
+            line-height: 1.45;
+        }
+
+        input[type="file"],
+        textarea,
+        select,
+        input[type="date"],
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:disabled,
+        input[type="file"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .roster-badge {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--indigo);
+            color: #c7d2fe;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* MINI DANGER BUTTON FOR CHAT HISTORY */
+        .btn-mini-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--crimson);
+            color: #fca5a5;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-mini-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* FULL-WIDTH RECONCILE BUTTON */
+        .reconcile-bar-container {
+            margin-bottom: 16px;
+        }
+
+        .btn-reconcile {
+            width: 100%;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--indigo), var(--cyan));
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-reconcile:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        /* STATUS BAR WITH TRASH ICON ON FAR RIGHT */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 0.84rem;
+        }
+
+        .stats-left {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            align-items: center;
+        }
+
+        .stats-left strong {
+            color: var(--cyan);
+        }
+
+        .btn-trash {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--crimson);
+            color: #fca5a5;
+            padding: 7px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-trash:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* SLIDE TABS & DOWNLOAD BUTTONS ROW */
+        .slides-action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .slide-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .slide-tab {
+            padding: 10px 16px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.83rem;
+            transition: all 0.2s ease;
+        }
+
+        .slide-tab.active-1 {
+            border-color: var(--amber);
+            color: var(--amber);
+            background: rgba(245, 158, 11, 0.15);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+
+        .slide-tab.active-2 {
+            border-color: var(--crimson);
+            color: var(--crimson);
+            background: rgba(239, 68, 68, 0.15);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        .slide-tab.active-3 {
+            border-color: var(--emerald);
+            color: var(--emerald);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .download-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ACTIVE SLIDE CONTAINER */
+        .slide-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            min-height: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+        }
+
+        .task-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+
+        .task-card.unassigned {
+            border-left: 4px solid var(--amber);
+        }
+
+        .task-card.omitted {
+            border-left: 4px solid var(--crimson);
+        }
+
+        .task-card.accounted {
+            border-left: 4px solid var(--emerald);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .task-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .status-chip {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .chip-amber {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--amber);
+        }
+
+        .chip-red {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--crimson);
+        }
+
+        .chip-green {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--emerald);
+        }
+
+        .quote-box {
+            background: var(--bg-panel);
+            border-left: 3px solid var(--cyan);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .meta-row strong {
+            color: var(--text-main);
+        }
+
+        .manager-triage-box {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .manager-triage-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .triage-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .locked-notice {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px dashed var(--amber);
+            color: #fde68a;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        #exportStagingArea {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 1100px;
+            background: #0b0f19;
+            color: #f8fafc;
+            padding: 32px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- OFFICE MODE ROLE MODAL -->
+    <div id="officeRoleModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--cyan);">🏢 Office Mode Portal</h3>
+            <p class="subtext">Choose your access role for Office Mode management:</p>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+                <button class="btn btn-primary" style="flex:1; padding:12px;" onclick="selectOfficeRole('MANAGER')">👑
+                    Manager Mode</button>
+                <button class="btn" style="flex:1; padding:12px;" onclick="selectOfficeRole('MEMBER')">👥 Team Member
+                    View</button>
+            </div>
+            <button class="btn" style="margin-top:4px;" onclick="closeOfficeRoleModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MANAGER LOGIN / SETUP MODAL -->
+    <div id="managerAuthModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="mgrModalTitle" style="color:var(--cyan);">👑 Manager Setup</h3>
+            <p id="mgrModalSub" class="subtext">First time setup: create your manager name and secure password.</p>
+            <div id="mgrSetupFields" style="display:flex; flex-direction:column; gap:10px;">
+                <input type="text" id="mgrSetupName" placeholder="Manager Name (e.g. Kamesh)..." />
+                <input type="password" id="mgrSetupPass" placeholder="Create Secure Password..." />
+            </div>
+            <div id="mgrLoginFields" style="display:none; flex-direction:column; gap:10px;">
+                <input type="password" id="mgrLoginPass" placeholder="Enter Manager Password..."
+                    onkeydown="if(event.key==='Enter') verifyManagerLogin()" />
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+                <button class="btn" onclick="closeManagerAuthModal()">Cancel</button>
+                <button class="btn btn-primary" id="mgrActionBtn" onclick="submitManagerAuth()">Continue 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JPEG EXPORT SELECTION MODAL -->
+    <div id="jpegExportModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--cyan);">🖼️ Download JPEG Report</h3>
+            <p class="subtext">Select which slide or view you want to export as an image:</p>
+            <select id="jpegSelectChoice" style="margin-top:6px;">
+                <option value="1">Slide 1: Unassigned Tasks ⚠️</option>
+                <option value="2">Slide 2: Omitted Scope 🚨</option>
+                <option value="3">Slide 3: Accounted Tasks ✅</option>
+                <option value="ALL">Download All Slides 📦</option>
+            </select>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                <button class="btn" onclick="closeJpegModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="executeJpegDownload()">Download JPEG 📥</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIBRANT SKETCH TOP HEADER -->
+    <header class="header">
+        <div class="brand-area">
+            <div class="brand-title">TASK NOVA-AI ✨</div>
+            <div class="subtext">DEXATHON 2026 (Team DEX262092) | Intent Extraction, Cumulative Chat Memory & Triage
+            </div>
+            <div class="compact-btns">
+                <button class="btn btn-demo" onclick="loadTestRunData()">⚡ [TEST RUN]</button>
+                <button class="btn" onclick="exportWorkspaceJSON()">💾 [EXP (.json)]</button>
+                <label class="btn" style="cursor:pointer;">
+                    📂 [IMP (.json)]
+                    <input type="file" accept=".json" style="display:none" onchange="importWorkspaceJSON(event)" />
+                </label>
+                <span id="syncStatusBadge" class="subtext" style="align-self:center; margin-left:6px;">🟢 Standalone
+                    Ready</span>
+            </div>
+        </div>
+
+        <div class="mode-buttons-right">
+            <button id="btnStudentMode" class="mode-btn active" onclick="switchRole('STUDENT')">🎓 Student Mode</button>
+            <button id="btnOfficeMode" class="mode-btn" onclick="openOfficeRoleModal()">🏢 Office Mode</button>
+        </div>
+    </header>
+
+    <!-- STAGE 2: 3 INPUT CARDS (MATCHING YOUR SKETCH) -->
+    <section id="inputSection" class="input-grid">
+        <!-- Card 1: Team Roster -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>👤 1. Team Roster Input</span>
+                <span class="subtext">Excel / Word / PDF / CSV</span>
+            </div>
+            <div class="instruction-box">
+                💡 <strong>Smart Parser Active:</strong> Automatically ignores Serial No, Register No & Admission Dates.
+                Extracts <strong>ONLY clean names</strong>.
+            </div>
+            <input type="file" id="rosterFileInput" accept=".xlsx,.xls,.csv,.docx,.pdf,.txt"
+                onchange="handleRosterUpload(event)" />
+            <div style="display:flex; gap:6px;">
+                <input type="text" id="manualMemberInput" placeholder="Or type individual name here..."
+                    onkeydown="if(event.key==='Enter') addManualMember()" />
+                <button class="btn" onclick="addManualMember()">Add ➕</button>
+            </div>
+            <div id="rosterBadges" class="badge-list"></div>
+        </div>
+
+        <!-- Card 2: Project Scope -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>📋 2. Project Scope List</span>
+                <button id="btnToggleScope" class="btn" style="padding:3px 9px; font-size:0.75rem;"
+                    onclick="toggleScopeLock()">🔒 Lock</button>
+            </div>
+            <div class="instruction-box">
+                💡 <strong>Permanent Scope Rule:</strong> One-time deliverable input. Upload your project document or
+                paste items below, then click Lock to freeze baseline.
+            </div>
+            <input type="file" id="scopeFileInput" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt"
+                onchange="handleScopeUpload(event)" />
+            <textarea id="scopeTextarea"
+                placeholder="1. Database Schema & ER Diagram&#10;2. FastAPI Backend & JWT API..."></textarea>
+        </div>
+
+        <!-- Card 3: Chat Logs (Exact Sketch Match: Description Box, Choose File, Type + Add to chats Button, Chat History Box + Clear History Button) -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>💬 3. Chat Logs</span>
+                <span class="subtext">txt / word / screenshot</span>
+            </div>
+            <div class="instruction-box">
+                💡 <strong>AI Chat Memory & OCR:</strong> Upload `.txt`, `.docx`, or chat screenshots, or type below.
+                Strips emojis, ignores duplicates & backs up all chats.
+            </div>
+
+            <input type="file" id="chatFileInput" accept=".txt,.docx,.png,.jpg,.jpeg,.webp" multiple
+                onchange="handleChatFileUpload(event)" />
+
+            <div style="display:flex; gap:6px;">
+                <input type="text" id="manualChatInput" placeholder="Type chat message..."
+                    onkeydown="if(event.key==='Enter') addManualChat()" />
+                <button class="btn btn-primary" style="white-space:nowrap;" onclick="addManualChat()">Add to
+                    chats</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="subtext" style="font-weight:700; color:var(--cyan);">Chat history</span>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <span id="ocrLoadingStatus" class="subtext" style="color:var(--amber); display:none;">⏳ Scanning
+                            OCR...</span>
+                        <button class="btn-mini-danger" onclick="clearChatHistoryOnly()"
+                            title="Delete Chat History Only">🗑️ Clear History</button>
+                    </div>
+                </div>
+                <textarea id="chatHistoryBox" readonly placeholder="Accumulated chat history appears here..."
+                    style="min-height:85px; background:#080b12; color:#94a3b8; font-size:0.78rem;"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- FULL-WIDTH RECONCILE BUTTON -->
+    <div id="reconcileContainer" class="reconcile-bar-container">
+        <button class="btn-reconcile" onclick="processChatBatch()">⚡ Reconcile chat batch</button>
+    </div>
+
+    <!-- STATUS BAR WITH TRASH ICON ON FAR RIGHT -->
+    <section id="statsSection" class="stats-bar">
+        <div class="stats-left">
+            <span>Active window: <strong id="statMode">Student mode</strong></span>
+            <span>Roster members: <strong id="statRosterCount">0</strong></span>
+            <span>Stored chat lines: <strong id="statChatCount">0</strong></span>
+            <span>Noise stripped: <strong id="statNoiseCount">0</strong></span>
+            <span>Duplicates ignored: <strong id="statDupCount">0</strong></span>
+        </div>
+        <button class="btn-trash" onclick="clearCurrentModeWorkspace()" title="Clear Entire Window">🗑️ Clear
+            Window</button>
+    </section>
+
+    <!-- SLIDES TABS & DOWNLOAD BUTTONS ROW -->
+    <section class="slides-action-row">
+        <div class="slide-tabs">
+            <button id="tabSlide1" class="slide-tab active-1" onclick="switchSlide(1)">Slide 1: Unassigned Tasks ⚠️
+                (<span id="countSlide1">0</span>)</button>
+            <button id="tabSlide2" class="slide-tab" onclick="switchSlide(2)">Slide 2: Omitted Scope 🚨 (<span
+                    id="countSlide2">0</span>)</button>
+            <button id="tabSlide3" class="slide-tab" onclick="switchSlide(3)">Slide 3: Accounted Tasks ✅ (<span
+                    id="countSlide3">0</span>)</button>
+        </div>
+
+        <div class="download-group">
+            <button id="btnDownloadPDF" class="btn btn-primary" onclick="exportPDFMultiPage()">📄 Download PDF</button>
+            <button id="btnDownloadJPEG" class="btn" style="border-color:var(--cyan); color:var(--cyan);"
+                onclick="openJpegModal()">🖼️ JPEG</button>
+        </div>
+    </section>
+
+    <!-- ACTIVE SLIDE CONTAINER -->
+    <main class="slide-container">
+        <div id="slideHeaderBanner"
+            style="margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+            <h2 id="slideTitle" style="font-size:1.05rem; color:var(--amber);">Slide 1: Unassigned Tasks</h2>
+            <p id="slideSubtitle" class="subtext">Tasks discussed in chat that still lack a confirmed owner.</p>
+        </div>
+        <div id="cardsGrid" class="cards-grid"></div>
+    </main>
+
+    <div id="exportStagingArea"></div>
+
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
+
+        let currentRole = "STUDENT"; // "STUDENT" | "OFFICE_MANAGER" | "OFFICE_MEMBER"
+        let managerConfig = { name: "", password: "" };
+
+        function createEmptyWorkspace() {
+            return {
+                activeSlide: 1,
+                scopeLocked: false,
+                roster: [],
+                scopeItems: [],
+                draftScopeText: "",
+                cumulativeChatLogs: [],
+                processedChatNormalized: [],
+                noiseStrippedCount: 0,
+                duplicatesIgnoredCount: 0,
+                tasks: []
+            };
+        }
+
+        let appState = {
+            workspaces: {
+                STUDENT: createEmptyWorkspace(),
+                OFFICE: createEmptyWorkspace()
+            },
+            managerConfig: { name: "", password: "" }
+        };
+
+        function activeBucketKey() {
+            return currentRole === "STUDENT" ? "STUDENT" : "OFFICE";
+        }
+
+        function ws() {
+            return appState.workspaces[activeBucketKey()];
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const localSaved = localStorage.getItem("tasknova_standalone_v1");
+            if (localSaved) {
+                try {
+                    const p = JSON.parse(localSaved);
+                    if (p && p.workspaces) appState = p;
+                } catch (e) { }
+            }
+            managerConfig = appState.managerConfig || { name: "", password: "" };
+            syncChatHistoryDisplay();
+            renderAll();
+        });
+
+        window.addEventListener("storage", (event) => {
+            if (event.key === "tasknova_standalone_v1" && event.newValue) {
+                try {
+                    appState = JSON.parse(event.newValue);
+                    managerConfig = appState.managerConfig || { name: "", password: "" };
+                    syncChatHistoryDisplay();
+                    renderAll();
+                } catch (e) { }
+            }
+        });
+
+        async function saveWorkspaceState() {
+            appState.managerConfig = managerConfig;
+            localStorage.setItem("tasknova_standalone_v1", JSON.stringify(appState));
+        }
+
+        function switchRole(role) {
+            currentRole = role;
+            syncChatHistoryDisplay();
+            renderAll();
+        }
+
+        function openOfficeRoleModal() {
+            document.getElementById("officeRoleModal").style.display = "flex";
+        }
+        function closeOfficeRoleModal() {
+            document.getElementById("officeRoleModal").style.display = "none";
+        }
+
+        function selectOfficeRole(roleType) {
+            closeOfficeRoleModal();
+            if (roleType === "MANAGER") {
+                openManagerAuthModal();
+            } else {
+                currentRole = "OFFICE_MEMBER";
+                renderAll();
+            }
+        }
+
+        function openManagerAuthModal() {
+            const modal = document.getElementById("managerAuthModal");
+            const title = document.getElementById("mgrModalTitle");
+            const sub = document.getElementById("mgrModalSub");
+            const setupFields = document.getElementById("mgrSetupFields");
+            const loginFields = document.getElementById("mgrLoginFields");
+
+            modal.style.display = "flex";
+            if (!managerConfig.password) {
+                title.textContent = "👑 Manager Setup";
+                sub.textContent = "First time setup: create your manager name and secure password.";
+                setupFields.style.display = "flex";
+                loginFields.style.display = "none";
+            } else {
+                title.textContent = "👑 Manager Login";
+                sub.textContent = "Enter your manager password to unlock editing & assignment.";
+                setupFields.style.display = "none";
+                loginFields.style.display = "flex";
+                document.getElementById("mgrLoginPass").value = "";
+                document.getElementById("mgrLoginPass").focus();
+            }
+        }
+
+        function closeManagerAuthModal() {
+            document.getElementById("managerAuthModal").style.display = "none";
+        }
+
+        function submitManagerAuth() {
+            if (!managerConfig.password) {
+                const name = document.getElementById("mgrSetupName").value.trim();
+                const pass = document.getElementById("mgrSetupPass").value.trim();
+                if (!name || !pass) { alert("Please enter both manager name and password."); return; }
+                managerConfig = { name, password: pass };
+                saveWorkspaceState();
+                closeManagerAuthModal();
+                currentRole = "OFFICE_MANAGER";
+                syncChatHistoryDisplay();
+                renderAll();
+            } else {
+                verifyManagerLogin();
+            }
+        }
+
+        function verifyManagerLogin() {
+            const entered = document.getElementById("mgrLoginPass").value.trim();
+            if (entered === managerConfig.password) {
+                closeManagerAuthModal();
+                currentRole = "OFFICE_MANAGER";
+                syncChatHistoryDisplay();
+                renderAll();
+            } else {
+                alert("❌ Incorrect Manager Password!");
+            }
+        }
+
+        function syncChatHistoryDisplay() {
+            const current = ws();
+            document.getElementById("scopeTextarea").value = current.scopeItems.length ? current.scopeItems.join("\n") : (current.draftScopeText || "");
+            document.getElementById("scopeTextarea").disabled = current.scopeLocked;
+            document.getElementById("scopeFileInput").disabled = current.scopeLocked;
+            document.getElementById("btnToggleScope").textContent = current.scopeLocked ? "🔓 Edit / Unlock" : "🔒 Lock";
+
+            const historyBox = document.getElementById("chatHistoryBox");
+            if (historyBox) {
+                historyBox.value = (current.cumulativeChatLogs || []).join("\n");
+            }
+        }
+
+        async function extractLinesFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const lines = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const text = await page.getTextContent();
+                text.items.forEach(item => { if (item.str.trim()) lines.push(item.str.trim()); });
+            }
+            return lines;
+        }
+
+        function cleanRosterStrings(rawList) {
+            const ignore = new Set(["serial no", "register no", "register num", "date of admission", "full name", "name", "student name", "admission date", "id", "sno", "sl no"]);
+            const cleaned = [];
+            rawList.forEach(item => {
+                String(item).split(/[,|\t\n]/).forEach(part => {
+                    let name = part.replace(/\b\d+[A-Za-z]+\d+\b/g, "").replace(/\d+/g, "").replace(/[^A-Za-z\s\.]/g, "").trim();
+                    if (name.length >= 3 && !ignore.has(name.toLowerCase())) cleaned.push(name);
+                });
+            });
+            return [...new Set(cleaned)];
+        }
+
+        async function handleRosterUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const ext = file.name.split(".").pop().toLowerCase();
+            const current = ws();
+            if (ext === "csv" || ext === "txt") {
+                const text = await file.text();
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(text.split("\n").slice(1))])];
+            } else if (ext === "xlsx" || ext === "xls") {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data, { type: "array" });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(XLSX.utils.sheet_to_json(sheet, { header: 1 }).flat())])];
+            } else if (ext === "docx") {
+                const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(res.value.split("\n"))])];
+            } else if (ext === "pdf") {
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(await extractLinesFromPDF(file))])];
+            }
+            await saveWorkspaceState(); renderAll();
+        }
+
+        async function addManualMember() {
+            const input = document.getElementById("manualMemberInput");
+            const cleaned = cleanRosterStrings([input.value]);
+            if (cleaned.length) { ws().roster = [...new Set([...ws().roster, ...cleaned])]; input.value = ""; await saveWorkspaceState(); renderAll(); }
+        }
+
+        function cleanScopeLines(rawLines) {
+            const ignore = new Set(["scope", "deliverables", "task", "tasks", "s.no", "item"]);
+            const cleaned = [];
+            rawLines.forEach(line => {
+                let text = String(line).replace(/^[\d]+[\.\)\-\:]\s*/, "").replace(/^[•\-\*]\s*/, "").trim();
+                if (text.length >= 4 && !ignore.has(text.toLowerCase())) cleaned.push(text);
+            });
+            return [...new Set(cleaned)];
+        }
+
+        async function handleScopeUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const ext = file.name.split(".").pop().toLowerCase();
+            const current = ws();
+            let raw = [];
+            if (ext === "txt" || ext === "csv") raw = (await file.text()).split(/\r?\n/);
+            else if (ext === "xlsx" || ext === "xls") {
+                const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+                raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 }).flat();
+            }
+            else if (ext === "docx") raw = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value.split(/\r?\n/);
+            else if (ext === "pdf") raw = await extractLinesFromPDF(file);
+
+            const parsed = cleanScopeLines(raw);
+            if (parsed.length) {
+                current.scopeItems = [...new Set([...current.scopeItems, ...parsed])];
+                document.getElementById("scopeTextarea").value = current.scopeItems.join("\n");
+                reconcileScopeWithTasks();
+                await saveWorkspaceState(); renderAll();
+            }
+        }
+
+        async function toggleScopeLock() {
+            const current = ws();
+            if (!current.scopeLocked) {
+                current.scopeItems = cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n"));
+                current.scopeLocked = true;
+                reconcileScopeWithTasks();
+            } else { current.scopeLocked = false; }
+            syncChatHistoryDisplay();
+            await saveWorkspaceState(); renderAll();
+        }
+
+        async function addManualChat() {
+            const input = document.getElementById("manualChatInput");
+            const text = input.value.trim();
+            if (!text) return;
+            const current = ws();
+            if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
+            current.cumulativeChatLogs.push(text);
+            input.value = "";
+            syncChatHistoryDisplay();
+            await saveWorkspaceState();
+            renderAll();
+        }
+
+        async function clearChatHistoryOnly() {
+            const current = ws();
+            current.cumulativeChatLogs = [];
+            current.processedChatNormalized = [];
+            current.noiseStrippedCount = 0;
+            current.duplicatesIgnoredCount = 0;
+            current.tasks = [];
+            reconcileScopeWithTasks();
+            document.getElementById("chatFileInput").value = "";
+            syncChatHistoryDisplay();
+            await saveWorkspaceState();
+            renderAll();
+        }
+
+        async function handleChatFileUpload(event) {
+            const files = Array.from(event.target.files);
+            let newLines = [];
+            const ocrStatus = document.getElementById("ocrLoadingStatus");
+
+            for (const f of files) {
+                const ext = f.name.split(".").pop().toLowerCase();
+                if (ext === "txt") {
+                    newLines.push(...(await f.text()).split(/\r?\n/));
+                } else if (ext === "docx") {
+                    newLines.push(...(await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() })).value.split(/\r?\n/));
+                } else if (["png", "jpg", "jpeg", "webp"].includes(ext)) {
+                    if (ocrStatus) ocrStatus.style.display = "inline";
+                    try {
+                        if (window.Tesseract) {
+                            const result = await Tesseract.recognize(f, 'eng');
+                            if (result && result.data && result.data.text) {
+                                newLines.push(...result.data.text.split(/\r?\n/));
+                            }
+                        } else {
+                            newLines.push(`[Screenshot uploaded: ${f.name}]`);
+                        }
+                    } catch (err) {
+                        newLines.push(`[Screenshot uploaded: ${f.name}]`);
+                    }
+                    if (ocrStatus) ocrStatus.style.display = "none";
+                }
+            }
+            if (newLines.length) {
+                const current = ws();
+                if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
+                current.cumulativeChatLogs.push(...newLines.filter(l => l.trim()));
+                syncChatHistoryDisplay();
+                await saveWorkspaceState();
+                renderAll();
+            }
+        }
+
+        async function processChatBatch() {
+            const current = ws();
+            const rawScope = cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n"));
+            if (rawScope.length) current.scopeItems = rawScope;
+
+            const linesToProcess = current.cumulativeChatLogs || [];
+            if (!linesToProcess.length) {
+                reconcileScopeWithTasks();
+                await saveWorkspaceState();
+                renderAll();
+                return;
+            }
+
+            linesToProcess.forEach(line => {
+                if (!line.trim()) return;
+                const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu;
+                const matches = line.match(emojiRegex);
+                const clean = line.replace(emojiRegex, "").trim();
+                const body = clean.replace(/^\[.*?\]\s*/, "").trim();
+                const norm = body.toLowerCase();
+
+                if (current.processedChatNormalized.includes(norm)) { current.duplicatesIgnoredCount++; return; }
+                current.processedChatNormalized.push(norm);
+                if (matches) current.noiseStrippedCount += matches.length;
+
+                let sender = "", msg = body;
+                if (body.includes(":")) { sender = body.split(":")[0].trim(); msg = body.split(":").slice(1).join(":").trim(); }
+
+                const owner = current.roster.find(r => r.toLowerCase().includes(sender.toLowerCase())) || "";
+                const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
+                const deadline = dlMatch ? dlMatch[0].replace(/^by\s+/i, "").trim() : "Missing Deadline";
+
+                let matchedScope = null;
+                for (const s of current.scopeItems) {
+                    if (s.toLowerCase().split(/\s+/).some(w => w.length > 3 && msg.toLowerCase().includes(w))) { matchedScope = s; break; }
+                }
+
+                const title = matchedScope || msg.slice(0, 68);
+                const idx = current.tasks.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
+                const taskObj = {
+                    id: idx >= 0 ? current.tasks[idx].id : "t_" + Math.random().toString(36).slice(2, 6),
+                    title: title, inScope: Boolean(matchedScope), mentionedInChat: true,
+                    owner: /\b(unassigned|need someone|who handles|who is doing)\b/i.test(msg) ? "" : owner,
+                    deadline: deadline, quote: `"${msg}" — ${sender || "Chat"}`, source: "CHAT"
+                };
+
+                if (idx >= 0) current.tasks[idx] = taskObj; else current.tasks.push(taskObj);
+            });
+
+            reconcileScopeWithTasks();
+            await saveWorkspaceState();
+            renderAll();
+        }
+
+        function reconcileScopeWithTasks() {
+            const current = ws();
+            current.scopeItems.forEach(s => {
+                if (!current.tasks.some(t => t.title.toLowerCase() === s.toLowerCase())) {
+                    current.tasks.push({
+                        id: "s_" + Math.random().toString(36).slice(2, 6),
+                        title: s, inScope: true, mentionedInChat: false, owner: "", deadline: "None", quote: "No chat mention found.", source: "SCOPE_GAP"
+                    });
+                }
+            });
+        }
+
+        async function managerAssignTask(taskId) {
+            const current = ws();
+            const owner = document.getElementById(`assignSelect_${taskId}`).value;
+            const dl = document.getElementById(`assignDate_${taskId}`).value || "Set by Manager";
+            if (!owner) { alert("Select member first."); return; }
+            current.tasks = current.tasks.map(t => t.id === taskId ? { ...t, owner: owner, deadline: dl, quote: `🛡️ Assigned by Manager (${managerConfig.name || "Kamesh"})` } : t);
+            await saveWorkspaceState(); renderAll();
+        }
+
+        function getCategorizedSlides() {
+            const current = ws();
+            return {
+                slide1: current.tasks.filter(t => t.mentionedInChat && !t.owner),
+                slide2: current.tasks.filter(t => t.inScope && !t.mentionedInChat && !t.owner),
+                slide3: current.tasks.filter(t => Boolean(t.owner))
+            };
+        }
+
+        function switchSlide(num) { ws().activeSlide = num; renderAll(); }
+
+        function buildCardHTML(task, slideNum, includeControls = true) {
+            const current = ws();
+            const isManager = currentRole === "OFFICE_MANAGER";
+            const cardClass = slideNum === 1 ? "unassigned" : slideNum === 2 ? "omitted" : "accounted";
+            let badge = slideNum === 1 ? '<span class="status-chip chip-amber">⚠️ Unassigned</span>' : slideNum === 2 ? '<span class="status-chip chip-red">🚨 Omitted Scope</span>' : '<span class="status-chip chip-green">✅ Accounted</span>';
+
+            let controls = "";
+            if (includeControls && (slideNum === 1 || slideNum === 2)) {
+                if (isManager) {
+                    const opts = current.roster.map(r => `<option value="${r}">${r}</option>`).join("");
+                    controls = `
+            <div class="manager-triage-box">
+              <div class="manager-triage-title">👑 Manager Assignment</div>
+              <div class="triage-controls">
+                <select id="assignSelect_${task.id}"><option value="">-- Member --</option>${opts}</select>
+                <input type="date" id="assignDate_${task.id}" />
+              </div>
+              <button class="btn btn-primary" style="width:100%; margin-top:4px;" onclick="managerAssignTask('${task.id}')">Assign Task ⚡</button>
+            </div>`;
+                } else if (currentRole === "OFFICE_MEMBER") {
+                    controls = `<div class="locked-notice">🔒 View-Only Mode (Locked)</div>`;
+                }
+            }
+
+            return `
+        <div class="task-card ${cardClass}">
+          <div class="card-top"><div class="task-title">${task.title}</div>${badge}</div>
+          <div class="quote-box">${task.quote}</div>
+          <div class="meta-row"><span>👤 Owner: <strong>${task.owner || "Unassigned"}</strong></span><span>📅 Deadline: <strong>${task.deadline}</strong></span></div>
+          ${controls}
+        </div>`;
+        }
+
+        function renderAll() {
+            const current = ws();
+            const isMember = currentRole === "OFFICE_MEMBER";
+            const isMgr = currentRole === "OFFICE_MANAGER";
+
+            document.getElementById("btnStudentMode").className = currentRole === "STUDENT" ? "mode-btn active" : "mode-btn";
+            document.getElementById("btnOfficeMode").className = (isMgr || isMember) ? "mode-btn active" : "mode-btn";
+
+            document.getElementById("inputSection").style.display = isMember ? "none" : "grid";
+            document.getElementById("reconcileContainer").style.display = isMember ? "none" : "block";
+
+            document.getElementById("statMode").textContent = isMember ? "Office mode (Team Member View-Only)" : isMgr ? `Office mode (Manager ${managerConfig.name || "Kamesh"})` : "Student mode";
+            document.getElementById("statRosterCount").textContent = current.roster.length;
+            document.getElementById("statChatCount").textContent = (current.cumulativeChatLogs || []).length;
+            document.getElementById("statNoiseCount").textContent = current.noiseStrippedCount || 0;
+            document.getElementById("statDupCount").textContent = current.duplicatesIgnoredCount || 0;
+            document.getElementById("rosterBadges").innerHTML = current.roster.length ? current.roster.map(n => `<span class="roster-badge">👤 ${n}</span>`).join("") : '<span class="subtext">No roster members loaded yet.</span>';
+
+            const { slide1, slide2, slide3 } = getCategorizedSlides();
+            document.getElementById("countSlide1").textContent = slide1.length;
+            document.getElementById("countSlide2").textContent = slide2.length;
+            document.getElementById("countSlide3").textContent = slide3.length;
+
+            document.getElementById("tabSlide1").className = "slide-tab" + (current.activeSlide === 1 ? " active-1" : "");
+            document.getElementById("tabSlide2").className = "slide-tab" + (current.activeSlide === 2 ? " active-2" : "");
+            document.getElementById("tabSlide3").className = "slide-tab" + (current.activeSlide === 3 ? " active-3" : "");
+
+            const slideHeaders = {
+                1: { title: "Slide 1: Unassigned Tasks ⚠️", color: "var(--amber)", sub: "Tasks discussed in chat that still lack a confirmed owner." },
+                2: { title: "Slide 2: Omitted Scope 🚨", color: "var(--crimson)", sub: "Deliverables in your locked Project Scope with zero mentions in chat." },
+                3: { title: "Slide 3: Accounted Tasks ✅", color: "var(--emerald)", sub: "Verified tasks assigned to a team member with extracted quotes & deadlines." }
+            };
+            const hdr = slideHeaders[current.activeSlide] || slideHeaders[1];
+            document.getElementById("slideTitle").textContent = hdr.title;
+            document.getElementById("slideTitle").style.color = hdr.color;
+            document.getElementById("slideSubtitle").textContent = hdr.sub;
+
+            const activeList = current.activeSlide === 1 ? slide1 : current.activeSlide === 2 ? slide2 : slide3;
+            document.getElementById("cardsGrid").innerHTML = activeList.length ? activeList.map(t => buildCardHTML(t, current.activeSlide, true)).join("") : '<div class="subtext" style="padding:20px; text-align:center;">✨ No tasks found in this slide yet. Click ⚡ [TEST RUN] at the top or upload your files!</div>';
+        }
+
+        async function exportPDFMultiPage() {
+            const { slide1, slide2, slide3 } = getCategorizedSlides();
+            const staging = document.getElementById("exportStagingArea");
+            const label = activeBucketKey();
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            const slidesData = [
+                { title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1 },
+                { title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2 },
+                { title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3 }
+            ];
+
+            for (let i = 0; i < slidesData.length; i++) {
+                const s = slidesData[i];
+                staging.innerHTML = `
+          <div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;">
+            <h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1>
+            <p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p>
+          </div>
+          <h2 style="color:${s.color}; margin-bottom:12px;">${s.title} (${s.items.length})</h2>
+          <div class="cards-grid">
+            ${s.items.length ? s.items.map(t => buildCardHTML(t, i + 1, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}
+          </div>
+        `;
+
+                const canvas = await html2canvas(staging, { backgroundColor: "#0b0f19", scale: 2 });
+                const imgData = canvas.toDataURL("image/jpeg", 0.95);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                if (i > 0) pdf.addPage();
+                pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+            }
+
+            pdf.save(`TaskNova_${label}_MultiPage_Report.pdf`);
+            staging.innerHTML = "";
+        }
+
+        function openJpegModal() {
+            document.getElementById("jpegExportModal").style.display = "flex";
+        }
+        function closeJpegModal() {
+            document.getElementById("jpegExportModal").style.display = "none";
+        }
+
+        async function executeJpegDownload() {
+            closeJpegModal();
+            const choice = document.getElementById("jpegSelectChoice").value;
+            const { slide1, slide2, slide3 } = getCategorizedSlides();
+            const staging = document.getElementById("exportStagingArea");
+            const label = activeBucketKey();
+
+            let targets = [];
+            if (choice === "ALL") {
+                targets = [
+                    { name: "Unassigned_Tasks", title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1, num: 1 },
+                    { name: "Omitted_Scope", title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2, num: 2 },
+                    { name: "Accounted_Tasks", title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3, num: 3 }
+                ];
+            } else {
+                const num = parseInt(choice);
+                const targetObj = num === 1 ? { name: "Unassigned_Tasks", title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1, num: 1 }
+                    : num === 2 ? { name: "Omitted_Scope", title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2, num: 2 }
+                        : { name: "Accounted_Tasks", title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3, num: 3 };
+                targets = [targetObj];
+            }
+
+            for (const t of targets) {
+                staging.innerHTML = `
+          <div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;">
+            <h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1>
+            <p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p>
+          </div>
+          <h2 style="color:${t.color}; margin-bottom:12px;">${t.title} (${t.items.length})</h2>
+          <div class="cards-grid">
+            ${t.items.length ? t.items.map(item => buildCardHTML(item, t.num, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}
+          </div>
+        `;
+
+                const canvas = await html2canvas(staging, { backgroundColor: "#0b0f19", scale: 2 });
+                const link = document.createElement("a");
+                link.download = `TaskNova_${label}_${t.name}.jpg`;
+                link.href = canvas.toDataURL("image/jpeg", 0.95);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            staging.innerHTML = "";
+        }
+
+        function exportWorkspaceJSON() {
+            appState.managerConfig = managerConfig;
+            const a = document.createElement("a");
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            a.download = "tasknova-workspace.json";
+            a.click();
+        }
+
+        function importWorkspaceJSON(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = async ev => {
+                try {
+                    appState = JSON.parse(ev.target.result);
+                    managerConfig = appState.managerConfig || { name: "", password: "" };
+                    syncChatHistoryDisplay();
+                    await saveWorkspaceState();
+                    renderAll();
+                } catch (err) {
+                    alert("Invalid JSON file!");
+                }
+            };
+            r.readAsText(f);
+        }
+
+        async function clearCurrentModeWorkspace() {
+            appState.workspaces[activeBucketKey()] = createEmptyWorkspace();
+            syncChatHistoryDisplay(); await saveWorkspaceState(); renderAll();
+        }
+
+        async function loadTestRunData() {
+            const key = activeBucketKey();
+            appState.workspaces[key] = {
+                activeSlide: 1, scopeLocked: true,
+                roster: ["Kamesh", "Karthik Subramanian", "Ananya Krishnan", "Rohan Deshmukh", "Divya Menon"],
+                scopeItems: ["Database Schema & ER Diagram", "FastAPI Backend & JWT", "React Frontend Dashboard", "LLM Prompt Pipeline", "Docker & Deployment"],
+                cumulativeChatLogs: [
+                    "[10:05 AM] Karthik Subramanian: I will take care of the Database Schema & ER Diagram by Friday, Oct 25 🚀🔥.",
+                    "[10:08 AM] Ananya Krishnan: I'll build the FastAPI Backend & JWT by Sunday, Oct 27 ✨.",
+                    "[10:15 AM] Divya Menon: Who handles API Security Audit?"
+                ],
+                processedChatNormalized: [], noiseStrippedCount: 0, duplicatesIgnoredCount: 0, tasks: []
+            };
+            syncChatHistoryDisplay();
+            await processChatBatch();
+        }
+    </script>
+</body>
+
+</html>
