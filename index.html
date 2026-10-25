@@ -558,9 +558,9 @@
             <p class="subtext">Choose your access role for Office Mode management:</p>
             <div style="display:flex; gap:10px; margin-top:6px;">
                 <button class="btn btn-primary" style="flex:1; padding:12px;" onclick="selectOfficeRole('MANAGER')">👑
-                    Manager Mode</button>
+                    Manager</button>
                 <button class="btn" style="flex:1; padding:12px;" onclick="selectOfficeRole('MEMBER')">👥 Team Member
-                    View</button>
+                </button>
             </div>
             <button class="btn" style="margin-top:4px;" onclick="closeOfficeRoleModal()">Cancel</button>
         </div>
@@ -581,7 +581,7 @@
             </div>
             <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
                 <button class="btn" onclick="closeManagerAuthModal()">Cancel</button>
-                <button class="btn btn-primary" id="mgrActionBtn" onclick="submitManagerAuth()">Continue 🚀</button>
+                <button class="btn btn-primary" id="mgrActionBtn" onclick="submitManagerAuth()">Continue </button>
             </div>
         </div>
     </div>
@@ -608,7 +608,7 @@
     <header class="header">
         <div class="brand-area">
             <div class="brand-title">TASK NOVA-AI ✨</div>
-            <div class="subtext">DEXATHON 2026 (Team DEX262092) | Intent Extraction, Cumulative Chat Memory & Triage
+            <div class="subtext">
             </div>
             <div class="compact-btns">
                 <button class="btn btn-demo" onclick="loadTestRunData()">⚡ [TEST RUN]</button>
@@ -926,12 +926,17 @@
         }
 
         function cleanRosterStrings(rawList) {
-            const ignore = new Set(["serial no", "register no", "register num", "date of admission", "full name", "name", "student name", "admission date", "id", "sno", "sl no"]);
+            // Enhanced filter to block PDF headers, long sentences, and column titles
+            const ignoreRegex = /\b(serial|register|admission|name|id|sno|sl no|dob|birth|dexathon|roster|confidential|page|ignoring)\b/i;
             const cleaned = [];
+
             rawList.forEach(item => {
                 String(item).split(/[,|\t\n]/).forEach(part => {
-                    let name = part.replace(/\b\d+[A-Za-z]+\d+\b/g, "").replace(/\d+/g, "").replace(/[^A-Za-z\s\.]/g, "").trim();
-                    if (name.length >= 3 && !ignore.has(name.toLowerCase())) cleaned.push(name);
+                    let text = part.replace(/\b\d+[A-Za-z]+\d+\b/g, "").replace(/\d+/g, "").replace(/[^A-Za-z\s\.]/g, "").trim();
+                    // Must be between 3 and 25 characters, and not contain any forbidden words
+                    if (text.length >= 3 && text.length <= 25 && !ignoreRegex.test(text)) {
+                        cleaned.push(text);
+                    }
                 });
             });
             return [...new Set(cleaned)];
@@ -1146,7 +1151,7 @@
                 const taskObj = {
                     id: idx >= 0 ? current.tasks[idx].id : "t_" + Math.random().toString(36).slice(2, 6),
                     title: title, inScope: Boolean(matchedScope), mentionedInChat: true,
-                    owner: /\b(unassigned|need someone|who handles|who is doing)\b/i.test(msg) ? "" : owner,
+                    owner: /\b(unassigned|need someone|who handles|who is doing|may i|can i)\b/i.test(msg) ? "" : owner,
                     deadline: deadline, quote: `"${msg}" — ${sender || "Chat"}`, source: "CHAT"
                 };
 
