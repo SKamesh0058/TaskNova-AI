@@ -43,7 +43,6 @@
             line-height: 1.4;
         }
 
-        /* VIBRANT SKETCH HEADER LAYOUT */
         .header {
             background: linear-gradient(135deg, #131b2e, #1a233a);
             border: 1px solid var(--border);
@@ -136,7 +135,6 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
 
-        /* INTERACTIVE MODALS */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -162,7 +160,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* 3 INPUT CARDS GRID */
         .input-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -259,7 +256,6 @@
             gap: 4px;
         }
 
-        /* MINI DANGER BUTTON FOR CHAT HISTORY */
         .btn-mini-danger {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid var(--crimson);
@@ -276,7 +272,6 @@
             background: rgba(239, 68, 68, 0.3);
         }
 
-        /* FULL-WIDTH RECONCILE BUTTON */
         .reconcile-bar-container {
             margin-bottom: 16px;
         }
@@ -303,7 +298,6 @@
             box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
         }
 
-        /* STATUS BAR WITH TRASH ICON ON FAR RIGHT */
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -345,7 +339,6 @@
             background: rgba(239, 68, 68, 0.3);
         }
 
-        /* SLIDE TABS & DOWNLOAD BUTTONS ROW */
         .slides-action-row {
             display: flex;
             justify-content: space-between;
@@ -399,7 +392,6 @@
             gap: 8px;
         }
 
-        /* ACTIVE SLIDE CONTAINER */
         .slide-container {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -581,7 +573,7 @@
             </div>
             <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
                 <button class="btn" onclick="closeManagerAuthModal()">Cancel</button>
-                <button class="btn btn-primary" id="mgrActionBtn" onclick="submitManagerAuth()">Continue </button>
+                <button class="btn btn-primary" id="mgrActionBtn" onclick="submitManagerAuth()">Continue</button>
             </div>
         </div>
     </div>
@@ -604,11 +596,11 @@
         </div>
     </div>
 
-    <!-- VIBRANT SKETCH TOP HEADER -->
+    <!-- TOP HEADER -->
     <header class="header">
         <div class="brand-area">
             <div class="brand-title">TASK NOVA-AI ✨</div>
-            <div class="subtext">
+            <div class="subtext">DEXATHON 2026 (Team DEX262092) | Intent Extraction, Cumulative Chat Memory & Triage
             </div>
             <div class="compact-btns">
                 <button class="btn btn-demo" onclick="loadTestRunData()">⚡ [TEST RUN]</button>
@@ -628,7 +620,7 @@
         </div>
     </header>
 
-    <!-- STAGE 2: 3 INPUT CARDS (MATCHING YOUR SKETCH) -->
+    <!-- 3 INPUT CARDS -->
     <section id="inputSection" class="input-grid">
         <!-- Card 1: Team Roster -->
         <div class="panel">
@@ -637,8 +629,8 @@
                 <span class="subtext">Excel / Word / PDF / CSV</span>
             </div>
             <div class="instruction-box">
-                💡 <strong>Smart Parser Active:</strong> Automatically ignores Serial No, Register No & Admission Dates.
-                Extracts <strong>ONLY clean names</strong>.
+                💡 <strong>Smart Parser Active:</strong> Automatically ignores Serial No, Register No (DEX codes),
+                Headers & Dates. Extracts <strong>ONLY clean names</strong>.
             </div>
             <input type="file" id="rosterFileInput" accept=".xlsx,.xls,.csv,.docx,.pdf,.txt"
                 onchange="handleRosterUpload(event)" />
@@ -659,8 +651,8 @@
                     onclick="toggleScopeLock()">🔒 Lock</button>
             </div>
             <div class="instruction-box">
-                💡 <strong>Permanent Scope Rule:</strong> One-time deliverable input. Upload your project document or
-                paste items below, then click Lock to freeze baseline.
+                💡 <strong>Permanent Scope Rule:</strong> One-time deliverable input. Automatically strips document
+                titles, DEX IDs, and page headers.
             </div>
             <input type="file" id="scopeFileInput" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt"
                 onchange="handleScopeUpload(event)" />
@@ -680,6 +672,18 @@
 
             <input type="text" id="youAliasInput" placeholder="If chats say 'You', who is it? (e.g. Kamesh)"
                 onchange="updateYouAlias()" style="margin-bottom:8px; border-color: var(--amber);" />
+
+            <!-- NICKNAME MAPPER FOR STUDENT MODE -->
+            <div id="nicknameMappingSection">
+                <div style="display:flex; gap:6px; margin-bottom:4px;">
+                    <input type="text" id="chatNickInput" placeholder="Chat Nicknames (comma separated)..."
+                        style="flex:1;" onkeydown="if(event.key==='Enter') addNicknameAlias()" />
+                    <input type="text" id="rosterTargetInput" placeholder="Roster Name (e.g. Hari)..." style="flex:1;"
+                        onkeydown="if(event.key==='Enter') addNicknameAlias()" />
+                    <button class="btn btn-demo" style="white-space:nowrap;" onclick="addNicknameAlias()">Map</button>
+                </div>
+                <div id="nickBadgeList" class="badge-list" style="margin-bottom:8px;"></div>
+            </div>
 
             <input type="file" id="chatFileInput" accept=".txt,.docx,.png,.jpg,.jpeg,.webp" multiple
                 onchange="handleChatFileUpload(event)" />
@@ -713,7 +717,7 @@
         <button class="btn-reconcile" onclick="processChatBatch()">⚡ Reconcile chat batch</button>
     </div>
 
-    <!-- STATUS BAR WITH TRASH ICON ON FAR RIGHT -->
+    <!-- STATUS BAR -->
     <section id="statsSection" class="stats-bar">
         <div class="stats-left">
             <span>Active window: <strong id="statMode">Student mode</strong></span>
@@ -775,7 +779,8 @@
                 processedChatNormalized: [],
                 noiseStrippedCount: 0,
                 duplicatesIgnoredCount: 0,
-                tasks: []
+                tasks: [],
+                nicknameMap: []
             };
         }
 
@@ -833,6 +838,34 @@
         function updateYouAlias() {
             managerConfig.youAlias = document.getElementById("youAliasInput").value.trim();
             saveWorkspaceState();
+        }
+
+        async function addNicknameAlias() {
+            const nickRaw = document.getElementById("chatNickInput").value.trim();
+            const real = document.getElementById("rosterTargetInput").value.trim();
+            if (!nickRaw || !real) return;
+
+            const current = ws();
+            if (!current.nicknameMap) current.nicknameMap = [];
+
+            const nicks = nickRaw.split(',').map(n => n.trim()).filter(n => n);
+            nicks.forEach(nick => {
+                current.nicknameMap.push({ nick, real });
+            });
+
+            document.getElementById("chatNickInput").value = "";
+            document.getElementById("rosterTargetInput").value = "";
+            await saveWorkspaceState();
+            renderAll();
+        }
+
+        async function removeNicknameAlias(idx) {
+            const current = ws();
+            if (current.nicknameMap) {
+                current.nicknameMap.splice(idx, 1);
+                await saveWorkspaceState();
+                renderAll();
+            }
         }
 
         function openOfficeRoleModal() {
@@ -925,6 +958,7 @@
             }
         }
 
+        // UPGRADED PDF EXTRACTOR: Groups items by visual row (Y-coordinate) so headers & table rows stay intact
         async function extractLinesFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -932,19 +966,76 @@
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const text = await page.getTextContent();
-                text.items.forEach(item => { if (item.str.trim()) lines.push(item.str.trim()); });
+                const rowMap = new Map();
+
+                text.items.forEach(item => {
+                    const str = item.str ? item.str.trim() : "";
+                    if (!str) return;
+                    const y = Math.round(item.transform[5]);
+                    let matchedY = null;
+                    for (const existingY of rowMap.keys()) {
+                        if (Math.abs(existingY - y) <= 3) {
+                            matchedY = existingY;
+                            break;
+                        }
+                    }
+                    const targetY = matchedY !== null ? matchedY : y;
+                    if (!rowMap.has(targetY)) rowMap.set(targetY, []);
+                    rowMap.get(targetY).push({ x: item.transform[4], width: item.width || 0, str });
+                });
+
+                const sortedYs = Array.from(rowMap.keys()).sort((a, b) => b - a);
+                sortedYs.forEach(y => {
+                    const rowItems = rowMap.get(y).sort((a, b) => a.x - b.x);
+                    let rowStr = "";
+                    for (let j = 0; j < rowItems.length; j++) {
+                        if (j === 0) {
+                            rowStr = rowItems[j].str;
+                        } else {
+                            const prev = rowItems[j - 1];
+                            const gap = rowItems[j].x - (prev.x + prev.width);
+                            rowStr += (gap > 10 ? " | " : " ") + rowItems[j].str;
+                        }
+                    }
+                    if (rowStr.trim()) lines.push(rowStr.trim());
+                });
             }
             return lines;
         }
 
+        // BULLETPROOF ROSTER CLEANER: Never takes S.No, DEX codes, dates, or document titles
         function cleanRosterStrings(rawList) {
-            const ignoreRegex = /\b(serial|register|admission|name|id|sno|sl no|dob|birth|dexathon|roster|confidential|page|ignoring)\b/i;
+            const fullLineHeaderRegex = /\b(dexathon|master\s*team|team\s*roster|roster\s*document|confidential|parser|extract\s*only|ignoring|table\s*below|official\s*list|track\s*0?\d|tasknova)\b/i;
+            const badWordRegex = /\b(s\s*no|sl\s*no|sr\s*no|sno|slno|serial|number|num|no|reg|register|registration|id|roll|date|dob|d\s*o\s*b|birth|admission|admitted|name|names|full\s*name|student|students|member|members|team|roster|list|table|column|columns|header|title|document|doc|pdf|page|pg|dex|dexathon|tasknova|track|project|scope|status|role|dept|department|branch|section|sec|year|batch|college|university|email|phone|mobile|contact|gender|male|female|age|remarks|total|confidential|official|master|ignoring|ignore|extract|parser|only|below|above|from|and|the|for)\b/i;
+
             const cleaned = [];
 
             rawList.forEach(item => {
-                String(item).split(/[,|\t\n]/).forEach(part => {
-                    let text = part.replace(/\b\d+[A-Za-z]+\d+\b/g, "").replace(/\d+/g, "").replace(/[^A-Za-z\s\.]/g, "").trim();
-                    if (text.length >= 3 && text.length <= 25 && !ignoreRegex.test(text)) {
+                const rawLine = String(item).trim();
+                if (!rawLine) return;
+
+                // 1. If the entire line is a document title or instruction sentence, skip the whole line
+                if (fullLineHeaderRegex.test(rawLine) && !rawLine.includes("|")) return;
+
+                // 2. Replace dates, alphanumeric IDs (like DEX262001, REG123), and standalone numbers with pipe separators
+                const preSplit = rawLine
+                    .replace(/\b\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}\b/g, " | ")
+                    .replace(/\b[A-Za-z]+\d+[A-Za-z\d]*\b/g, " | ")
+                    .replace(/\b\d+[A-Za-z]+[A-Za-z\d]*\b/g, " | ")
+                    .replace(/\b\d+[\.\)]?\b/g, " | ");
+
+                preSplit.split(/[,|\t\n]+/).forEach(part => {
+                    // Replace dots and special chars with spaces so "S.No." becomes "S No"
+                    let text = part.replace(/[^A-Za-z\s]/g, " ").replace(/\s+/g, " ").trim();
+                    if (!text) return;
+
+                    // Reject if it contains any header/column/noise word
+                    if (badWordRegex.test(text)) return;
+
+                    // Must be 1 to 3 words, 3 to 25 chars total, and have at least one word with >= 3 letters
+                    const words = text.split(" ");
+                    const hasRealWord = words.some(w => w.length >= 3);
+                    if (text.length >= 3 && text.length <= 25 && words.length <= 3 && hasRealWord) {
                         cleaned.push(text);
                     }
                 });
@@ -959,7 +1050,7 @@
             const current = ws();
             if (ext === "csv" || ext === "txt") {
                 const text = await file.text();
-                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(text.split("\n").slice(1))])];
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(text.split(/\r?\n/))])];
             } else if (ext === "xlsx" || ext === "xls") {
                 const data = await file.arrayBuffer();
                 const workbook = XLSX.read(data, { type: "array" });
@@ -967,7 +1058,7 @@
                 current.roster = [...new Set([...current.roster, ...cleanRosterStrings(XLSX.utils.sheet_to_json(sheet, { header: 1 }).flat())])];
             } else if (ext === "docx") {
                 const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(res.value.split("\n"))])];
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(res.value.split(/\r?\n/))])];
             } else if (ext === "pdf") {
                 current.roster = [...new Set([...current.roster, ...cleanRosterStrings(await extractLinesFromPDF(file))])];
             }
@@ -988,12 +1079,42 @@
             }
         }
 
+        // BULLETPROOF SCOPE CLEANER: Ignores all document headers, titles, DEX codes, and page numbers
         function cleanScopeLines(rawLines) {
-            const ignoreRegex = /\b(scope|deliverables|task|tasks|s\.no|item|dex262092|page|project)\b/i;
+            const docHeaderRegex = /\b(dex262\d*|dexathon|tasknova|team\s*id|track\s*0?\d|confidential|official\s*project|baseline\s*deliverables|master\s*deliverables|master\s*list|parser|extract\s*only|ignoring|ignore\s*headers|table\s*below|one-time\s*deliverable|freeze\s*baseline|page\s*\d+|page\s*one|page\s*two|generated\s*on|prepared\s*by|serial\s*no|s\.no|sl\.no|register\s*no|date\s*of\s*birth)\b/i;
+
+            const exactHeadingRegex = /^(project\s*scope(\s*list|\s*document|\s*baseline)?|scope\s*of\s*work|scope\s*list|scope\s*items?|scope|deliverables?(\s*list|\s*baseline)?|project\s*deliverables?|tasks?(\s*list)?|modules?(\s*list)?|requirements?(\s*list)?|specifications?|s\s*no|sl\s*no|serial\s*no|item\s*no|item|id|code|category|module|description|priority|status|owner|deadline|timeline|phase\s*\d*|page\s*\d*|header|title|document|overview|summary)$/i;
+
             const cleaned = [];
             rawLines.forEach(line => {
-                let text = String(line).replace(/^[\d]+[\.\)\-\:]\s*/, "").replace(/^[•\-\*]\s*/, "").trim();
-                if (text.length >= 4 && !ignoreRegex.test(text)) cleaned.push(text);
+                const raw = String(line).trim();
+                if (!raw) return;
+
+                // 1. Block any line matching document-level headers, footers, or instructions
+                if (docHeaderRegex.test(raw)) return;
+
+                // 2. Strip leading item numbers (e.g., "1.", "01 |", "MOD-01 |") and table pipes
+                let text = raw
+                    .replace(/^\s*\d+[\.\)\-\:\|]*\s*/, "")
+                    .replace(/^\s*[A-Z]{2,5}[-_]\d+[\.\)\-\:\|]*\s*/i, "")
+                    .replace(/^[•\-\*\|]\s*/, "")
+                    .replace(/\|/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+                // Strip trailing status/priority columns if present from a table
+                text = text.replace(/\s+\b(high|medium|low|pending|completed|in\s*progress|mandatory|core)\b$/i, "").trim();
+
+                if (!text) return;
+
+                // 3. Block standalone section headings
+                const normCheck = text.replace(/[^A-Za-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                if (exactHeadingRegex.test(normCheck)) return;
+
+                // 4. Must be between 3 and 75 chars and contain at least one word >= 3 letters
+                if (text.length >= 3 && text.length <= 75 && /[A-Za-z]{3,}/.test(text)) {
+                    cleaned.push(text);
+                }
             });
             return [...new Set(cleaned)];
         }
@@ -1100,6 +1221,29 @@
             }
         }
 
+        function resolveRosterMember(rawName, current) {
+            if (!rawName) return "";
+            const nameLower = rawName.toLowerCase().trim();
+            const youAlias = document.getElementById("youAliasInput") ? document.getElementById("youAliasInput").value.trim().toLowerCase() : "";
+
+            if ((nameLower === "you" || nameLower === "me") && youAlias) {
+                return current.roster.find(r => r.toLowerCase().includes(youAlias) || youAlias.includes(r.toLowerCase())) || youAlias;
+            }
+
+            if (current.nicknameMap) {
+                const mapped = current.nicknameMap.find(m => nameLower.includes(m.nick.toLowerCase()) || m.nick.toLowerCase() === nameLower);
+                if (mapped) {
+                    return current.roster.find(r => r.toLowerCase().includes(mapped.real.toLowerCase()) || mapped.real.toLowerCase().includes(r.toLowerCase())) || mapped.real;
+                }
+            }
+
+            return current.roster.find(r =>
+                nameLower.includes(r.toLowerCase()) ||
+                r.toLowerCase().includes(nameLower) ||
+                (r.length >= 4 && nameLower.slice(0, 4) === r.toLowerCase().slice(0, 4))
+            ) || "";
+        }
+
         async function processChatBatch() {
             const current = ws();
             const rawScope = cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n"));
@@ -1113,14 +1257,17 @@
                 return;
             }
 
+            let lastRequestedTaskIndex = -1;
+            let lastRequesterName = "";
+
             linesToProcess.forEach(line => {
                 if (!line.trim()) return;
                 const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu;
                 const matches = line.match(emojiRegex);
                 const clean = line.replace(emojiRegex, "").trim();
 
-                // OCR CLEANUP: Fix Tesseract reading 'I' as '|' and remove time stamps like "7:54 pm" at the end
-                let body = clean.replace(/^\[.*?\]\s*/, "").replace(/^\|\s*/g, "I ").replace(/\b\d{1,2}:\d{2}\s*[ap]m\b/gi, "").trim();
+                // OCR CLEANUP: Fix Tesseract reading 'I' as '|' and remove timestamps like "7:54 pm"
+                let body = clean.replace(/^\[.*?\]\s*/, "").replace(/^\|\s*/g, "I ").replace(/\b(edited\s*)?\d{1,2}:\d{2}\s*([ap]m)?\s*(w\/|v\/)?$/gi, "").trim();
 
                 const norm = body.toLowerCase();
 
@@ -1134,17 +1281,7 @@
                     msg = body.split(":").slice(1).join(":").trim();
                 }
 
-                // NEW: WhatsApp "You" Mapper
-                const youAlias = document.getElementById("youAliasInput") ? document.getElementById("youAliasInput").value.trim() : "";
-                if ((sender.toLowerCase() === "you" || sender.toLowerCase() === "me") && youAlias) {
-                    sender = youAlias;
-                }
-
-                // UPGRADED: Smarter Roster Matching (maps "Karthik Bro" to "Karthik")
-                const owner = current.roster.find(r =>
-                    sender.toLowerCase().includes(r.toLowerCase()) ||
-                    r.toLowerCase().slice(0, 4) === sender.toLowerCase().slice(0, 4)
-                ) || "";
+                const owner = resolveRosterMember(sender, current);
 
                 const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|may\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
                 const deadline = dlMatch ? dlMatch[0].replace(/^by\s+/i, "").trim() : "Missing Deadline";
@@ -1165,21 +1302,46 @@
                     }
                 }
 
-                if (!matchedScope && (msg.length < 20 || /^(yes|no|ok|sure|thanks|agree)\b/i.test(msg))) return;
+                // Handle approval replies like "yes u can balaji" or "sure you can take it"
+                if (!matchedScope && /\b(yes|sure|ok|go ahead)\b.*\b(you can|u can|take it)\b/i.test(msg)) {
+                    const approvedPerson = current.roster.find(r => msg.toLowerCase().includes(r.toLowerCase().slice(0, 4))) || lastRequesterName;
+                    if (approvedPerson && lastRequestedTaskIndex >= 0 && current.tasks[lastRequestedTaskIndex]) {
+                        current.tasks[lastRequestedTaskIndex].owner = approvedPerson;
+                    }
+                    return;
+                }
+
+                if (!matchedScope && (msg.length < 20 || /^(yes|no|ok|sure|thanks|agree|nope|nah|cool|fine|great|good|done|ready|yep|yeah)\b/i.test(msg))) return;
 
                 const title = matchedScope || msg.slice(0, 68);
                 const idx = current.tasks.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
 
-                const isDeclinedOrAsking = /\b(unassigned|need someone|who handles|who is doing|may i|can i|can't|cant|cannot|won't|wont|will not|not me)\b/i.test(msg);
+                const isAskingPermission = /\b(may i|can i|could i|shall i)\b/i.test(msg);
+                const isDeclinedOrOpenQuestion = /\b(unassigned|need someone|who handles|who is doing|what about|can't|cant|cannot|won't|wont|will not|not me|unable)\b/i.test(msg);
 
                 const taskObj = {
                     id: idx >= 0 ? current.tasks[idx].id : "t_" + Math.random().toString(36).slice(2, 6),
-                    title: title, inScope: Boolean(matchedScope), mentionedInChat: true,
-                    owner: isDeclinedOrAsking ? "" : owner,
-                    deadline: deadline, quote: `"${msg}" — ${sender || "Chat"}`, source: "CHAT"
+                    title: title,
+                    inScope: Boolean(matchedScope),
+                    mentionedInChat: true,
+                    owner: (isAskingPermission || isDeclinedOrOpenQuestion) ? "" : owner,
+                    deadline: deadline,
+                    quote: `"${msg}" — ${sender || "Chat"}`,
+                    source: "CHAT"
                 };
 
-                if (idx >= 0) current.tasks[idx] = taskObj; else current.tasks.push(taskObj);
+                let savedIndex = idx;
+                if (idx >= 0) {
+                    current.tasks[idx] = taskObj;
+                } else {
+                    current.tasks.push(taskObj);
+                    savedIndex = current.tasks.length - 1;
+                }
+
+                if (isAskingPermission && owner) {
+                    lastRequestedTaskIndex = savedIndex;
+                    lastRequesterName = owner;
+                }
             });
 
             reconcileScopeWithTasks();
@@ -1189,6 +1351,8 @@
 
         function reconcileScopeWithTasks() {
             const current = ws();
+            // Remove any staleSCOPE_GAP tasks that are no longer in scopeItems
+            current.tasks = current.tasks.filter(t => t.source !== "SCOPE_GAP" || current.scopeItems.some(s => s.toLowerCase() === t.title.toLowerCase()));
             current.scopeItems.forEach(s => {
                 if (!current.tasks.some(t => t.title.toLowerCase() === s.toLowerCase())) {
                     current.tasks.push({
@@ -1263,12 +1427,23 @@
             document.getElementById("inputSection").style.display = isMember ? "none" : "grid";
             document.getElementById("reconcileContainer").style.display = isMember ? "none" : "block";
 
+            const nickSection = document.getElementById("nicknameMappingSection");
+            if (nickSection) nickSection.style.display = (currentRole === "STUDENT") ? "block" : "none";
+
             document.getElementById("statMode").textContent = isMember ? "Office mode (Team Member View-Only)" : isMgr ? `Office mode (Manager ${managerConfig.name || "Kamesh"})` : "Student mode";
             document.getElementById("statRosterCount").textContent = current.roster.length;
             document.getElementById("statChatCount").textContent = (current.cumulativeChatLogs || []).length;
             document.getElementById("statNoiseCount").textContent = current.noiseStrippedCount || 0;
             document.getElementById("statDupCount").textContent = current.duplicatesIgnoredCount || 0;
             document.getElementById("rosterBadges").innerHTML = current.roster.length ? current.roster.map(n => `<span class="roster-badge">👤 ${n}</span>`).join("") : '<span class="subtext">No roster members loaded yet.</span>';
+
+            const nickList = current.nicknameMap || [];
+            const badgeListEl = document.getElementById("nickBadgeList");
+            if (badgeListEl) {
+                badgeListEl.innerHTML = nickList.map((m, i) =>
+                    `<span class="roster-badge" style="cursor:pointer;" onclick="removeNicknameAlias(${i})" title="Click to remove">🔗 ${m.nick} ➔ ${m.real} ✖</span>`
+                ).join("");
+            }
 
             const { slide1, slide2, slide3 } = getCategorizedSlides();
             document.getElementById("countSlide1").textContent = slide1.length;
@@ -1412,21 +1587,76 @@
 
         async function clearCurrentModeWorkspace() {
             appState.workspaces[activeBucketKey()] = createEmptyWorkspace();
-            syncChatHistoryDisplay(); await saveWorkspaceState(); renderAll();
+            document.getElementById("rosterFileInput").value = "";
+            document.getElementById("scopeFileInput").value = "";
+            document.getElementById("chatFileInput").value = "";
+            syncChatHistoryDisplay();
+            await saveWorkspaceState();
+            renderAll();
         }
 
         async function loadTestRunData() {
             const key = activeBucketKey();
+            managerConfig.youAlias = "Kamesh";
+
+            const testChats = `[10:00 AM] Kamesh: alright team let's split the work for DEX262092
+[10:01 AM] Karthik Subramanian: I can do the Database Schema by Monday
+[10:02 AM] Balaje College: may I take the React Frontend Dashboard?
+[10:05 AM] Kaamu: I will not do the FastAPI Backend
+[10:06 AM] Hari IT: I can take the FastAPI Backend by wednesday 14
+[10:07 AM] Ananya Krishnan: I'll handle the JWT Authentication
+[10:08 AM] Rohan Deshmukh: who is doing the ER Diagram?
+[10:09 AM] Divya Menon: I can do the ER Diagram
+[10:10 AM] Rahul: ???
+[10:11 AM] Priya: I won't do the State Management
+[10:12 AM] Vikram: I'll take State Management by Oct 20
+[10:13 AM] Sneha: can I do the User Login Module?
+[10:14 AM] Amit: I'll do OAuth Integration
+[10:15 AM] Neha: what about the Chat Parsing Engine?
+[10:16 AM] Siddharth: I will take care of the Chat Parsing Engine
+[10:17 AM] Pooja: I cant do the NLP Keyword Extractor
+[10:18 AM] Aditya: I will do NLP Keyword Extractor
+[10:19 AM] Kavya: I will do Regex Filtering Module by Friday
+[10:20 AM] Manish: 🚀🔥
+[10:21 AM] Sanjay: I will take the PDF Data Extractor
+[10:22 AM] Kiran: may i do the OCR Screenshot Module?
+[10:23 AM] Ramesh: I will do Local Storage Sync
+[10:24 AM] Suresh: I cannot do Manager Mode UI
+[10:25 AM] Asha: I'll do Manager Mode UI
+[10:26 AM] Meera: I'll do Student Mode UI
+[10:27 AM] Arjun: I'll take Task Assignment Logic
+[10:28 AM] Ritu: I will not do Deadline Detection System
+[10:29 AM] Anil: I will do Deadline Detection System
+[10:30 AM] Sunita: I'll do Unassigned Tasks Slide
+[10:31 AM] Manoj: I'll do Omitted Scope Slide
+[10:38 AM] Hari IT: I will also take Accounted Tasks Slide
+[10:39 AM] Ananya Krishnan: I'll do the PDF Export Feature
+[10:40 AM] You: I will take the JPEG Export Feature
+[10:41 AM] Divya Menon: wait, who handles Cloud Deployment?
+[10:42 AM] Rahul: I'll take Cloud Deployment by Nov 1
+[10:43 AM] Priya: I'll do Docker Containerization
+[10:44 AM] Vikram: I won't do CI/CD Pipeline
+[10:45 AM] Sneha: I'll do CI/CD Pipeline
+[10:46 AM] Amit: can i take Unit Testing Setup?
+[10:47 AM] Neha: I'll do API Security Audit
+[10:48 AM] Siddharth: I will do Database Indexing
+[10:49 AM] Pooja: I'll do UI/UX Wireframing
+[10:50 AM] Aditya: I can't do CSS Animations
+[10:51 AM] Kavya: I'll do CSS Animations
+[10:52 AM] Manish: I'll do Project Documentation
+[10:53 AM] Sanjay: I'll do Slide Deck Preparation
+[10:54 AM] Kiran: I'll do Pitch Video Script`;
+
             appState.workspaces[key] = {
                 activeSlide: 1, scopeLocked: true,
-                roster: ["Kamesh", "Karthik Subramanian", "Ananya Krishnan", "Rohan Deshmukh", "Divya Menon"],
-                scopeItems: ["Database Schema & ER Diagram", "FastAPI Backend & JWT", "React Frontend Dashboard", "LLM Prompt Pipeline", "Docker & Deployment"],
-                cumulativeChatLogs: [
-                    "[10:05 AM] Karthik Subramanian: I will take care of the Database Schema & ER Diagram by Friday, Oct 25 🚀🔥.",
-                    "[10:08 AM] Ananya Krishnan: I'll build the FastAPI Backend & JWT by Sunday, Oct 27 ✨.",
-                    "[10:15 AM] Divya Menon: Who handles API Security Audit?"
-                ],
-                processedChatNormalized: [], noiseStrippedCount: 0, duplicatesIgnoredCount: 0, tasks: []
+                roster: ["Kamesh", "Karthik Subramanian", "Balaje", "Haryana", "Abi", "Kaamu", "Hari", "Ananya Krishnan", "Rohan Deshmukh", "Divya Menon", "Rahul", "Priya", "Vikram", "Sneha", "Amit", "Neha", "Siddharth", "Pooja", "Aditya", "Kavya", "Manish", "Sanjay", "Kiran", "Ramesh", "Suresh", "Asha", "Meera", "Arjun", "Ritu", "Anil", "Sunita", "Manoj"],
+                scopeItems: ["Database Schema", "ER Diagram", "FastAPI Backend", "JWT Authentication", "React Frontend Dashboard", "State Management", "User Login Module", "OAuth Integration", "Chat Parsing Engine", "NLP Keyword Extractor", "Regex Filtering Module", "PDF Data Extractor", "OCR Screenshot Module", "Local Storage Sync", "Manager Mode UI", "Student Mode UI", "Task Assignment Logic", "Deadline Detection System", "Unassigned Tasks Slide", "Omitted Scope Slide", "Accounted Tasks Slide", "PDF Export Feature", "JPEG Export Feature", "Cloud Deployment", "Docker Containerization", "CI/CD Pipeline", "Unit Testing Setup", "API Security Audit", "Database Indexing", "UI/UX Wireframing", "CSS Animations", "Project Documentation", "Slide Deck Preparation", "Pitch Video Script"],
+                cumulativeChatLogs: testChats.split('\n'),
+                processedChatNormalized: [], noiseStrippedCount: 0, duplicatesIgnoredCount: 0, tasks: [],
+                nicknameMap: [
+                    { nick: "Hari IT", real: "Hari" },
+                    { nick: "Balaje College", real: "Balaje" }
+                ]
             };
             syncChatHistoryDisplay();
             await processChatBatch();
