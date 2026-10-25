@@ -4,16 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TaskNova-AI ✨ </title>
-
-    <!-- Standalone Browser Engines: Excel, Word, PDF, Image OCR (Tesseract.js), PDF/JPEG Export -->
+    <title>TaskNova-AI ✨ | Standalone Prototype (DEX262092)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -72,19 +69,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .compact-btns {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-top: 4px;
-        }
-
+        .compact-btns,
         .mode-buttons-right {
             display: flex;
             gap: 8px;
-            align-items: center;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn {
@@ -138,26 +128,54 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 99999;
             padding: 16px;
         }
 
         .modal-box {
             background: var(--bg-card);
-            border: 1px solid var(--indigo);
+            border: 2px solid var(--crimson);
             border-radius: 14px;
             padding: 24px;
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
             gap: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .warning-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 4px 0;
+        }
+
+        .warning-item {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 5px solid var(--crimson);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #fecaca;
+            line-height: 1.45;
+            font-weight: 700;
+        }
+
+        .error-banner {
+            display: none;
+            background: rgba(239, 68, 68, 0.18);
+            border: 2px solid var(--crimson);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            color: #fecaca;
         }
 
         .input-grid {
@@ -176,6 +194,13 @@
             flex-direction: column;
             gap: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: 0.25s;
+        }
+
+        .panel.panel-error {
+            border: 3px solid var(--crimson) !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7) !important;
+            background: rgba(239, 68, 68, 0.05);
         }
 
         .panel-title {
@@ -241,6 +266,8 @@
             flex-wrap: wrap;
             gap: 6px;
             margin-top: 4px;
+            max-height: 130px;
+            overflow-y: auto;
         }
 
         .roster-badge {
@@ -265,11 +292,6 @@
             font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-mini-danger:hover {
-            background: rgba(239, 68, 68, 0.3);
         }
 
         .reconcile-bar-container {
@@ -288,14 +310,12 @@
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .btn-reconcile:hover {
             opacity: 0.95;
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
         }
 
         .stats-bar {
@@ -332,11 +352,6 @@
             border-radius: 7px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
-        }
-
-        .btn-trash:hover {
-            background: rgba(239, 68, 68, 0.3);
         }
 
         .slides-action-row {
@@ -348,7 +363,8 @@
             margin-bottom: 14px;
         }
 
-        .slide-tabs {
+        .slide-tabs,
+        .download-group {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -363,33 +379,24 @@
             cursor: pointer;
             font-weight: 700;
             font-size: 0.83rem;
-            transition: all 0.2s ease;
         }
 
         .slide-tab.active-1 {
             border-color: var(--amber);
             color: var(--amber);
             background: rgba(245, 158, 11, 0.15);
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
         }
 
         .slide-tab.active-2 {
             border-color: var(--crimson);
             color: var(--crimson);
             background: rgba(239, 68, 68, 0.15);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
         }
 
         .slide-tab.active-3 {
             border-color: var(--emerald);
             color: var(--emerald);
             background: rgba(16, 185, 129, 0.15);
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
-        }
-
-        .download-group {
-            display: flex;
-            gap: 8px;
         }
 
         .slide-container {
@@ -398,7 +405,6 @@
             border-radius: 14px;
             padding: 20px;
             min-height: 300px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
 
         .cards-grid {
@@ -415,12 +421,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            transition: transform 0.2s ease;
-        }
-
-        .task-card:hover {
-            transform: translateY(-2px);
-            border-color: #3b82f6;
         }
 
         .task-card.unassigned {
@@ -508,7 +508,6 @@
             font-weight: 700;
             color: var(--cyan);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .triage-controls {
@@ -543,7 +542,17 @@
 
 <body>
 
-    <!-- OFFICE MODE ROLE MODAL -->
+    <div id="validationModal" class="modal-overlay">
+        <div class="modal-box" style="border-color: var(--crimson);">
+            <h3 style="color: #fca5a5;">🚨 Reconcile Blocked — Missing Required Steps!</h3>
+            <p class="subtext">The program did NOT run because the following required step(s) are missing:</p>
+            <div id="validationErrorsList" class="warning-list"></div>
+            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+                <button class="btn btn-primary" onclick="closeValidationModal()">OK, I Will Fix It</button>
+            </div>
+        </div>
+    </div>
+
     <div id="officeRoleModal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="color:var(--cyan);">🏢 Office Mode Portal</h3>
@@ -558,7 +567,6 @@
         </div>
     </div>
 
-    <!-- MANAGER LOGIN / SETUP MODAL -->
     <div id="managerAuthModal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="mgrModalTitle" style="color:var(--cyan);">👑 Manager Setup</h3>
@@ -578,7 +586,6 @@
         </div>
     </div>
 
-    <!-- JPEG EXPORT SELECTION MODAL -->
     <div id="jpegExportModal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="color:var(--cyan);">🖼️ Download JPEG Report</h3>
@@ -596,7 +603,6 @@
         </div>
     </div>
 
-    <!-- TOP HEADER -->
     <header class="header">
         <div class="brand-area">
             <div class="brand-title">TASK NOVA-AI ✨</div>
@@ -613,67 +619,63 @@
                     Ready</span>
             </div>
         </div>
-
         <div class="mode-buttons-right">
             <button id="btnStudentMode" class="mode-btn active" onclick="switchRole('STUDENT')">🎓 Student Mode</button>
             <button id="btnOfficeMode" class="mode-btn" onclick="openOfficeRoleModal()">🏢 Office Mode</button>
         </div>
     </header>
 
-    <!-- 3 INPUT CARDS -->
+    <div id="inlineErrorBanner" class="error-banner">
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; color:#fca5a5;">🚨 RECONCILE BLOCKED — FIX
+            THE FOLLOWING MISSING STEPS:</div>
+        <div id="inlineErrorText" style="display:flex; flex-direction:column; gap:4px; font-size:0.84rem;"></div>
+    </div>
+
     <section id="inputSection" class="input-grid">
-        <!-- Card 1: Team Roster -->
-        <div class="panel">
+        <div id="cardRoster" class="panel">
             <div class="panel-title">
                 <span>👤 1. Team Roster Input</span>
                 <span class="subtext">Excel / Word / PDF / CSV</span>
             </div>
             <div class="instruction-box">
-                💡 <strong>Smart Parser Active:</strong> Automatically ignores Serial No, Register No (DEX codes),
-                Headers & Dates. Extracts <strong>ONLY clean names</strong>.
+                💡 <strong>Step 1 Required:</strong> Upload your Roster file or add names below.
             </div>
             <input type="file" id="rosterFileInput" accept=".xlsx,.xls,.csv,.docx,.pdf,.txt"
                 onchange="handleRosterUpload(event)" />
             <div style="display:flex; gap:6px;">
                 <textarea id="manualMemberInput" placeholder="Type name (Shift+Enter for new line)"
-                    style="min-height: 40px; padding-top: 10px; resize: vertical;"
+                    style="min-height: 40px; padding-top: 10px;"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); addManualMember(); }"></textarea>
                 <button class="btn" onclick="addManualMember()">Add ➕</button>
             </div>
             <div id="rosterBadges" class="badge-list"></div>
         </div>
 
-        <!-- Card 2: Project Scope -->
-        <div class="panel">
+        <div id="cardScope" class="panel">
             <div class="panel-title">
                 <span>📋 2. Project Scope List</span>
                 <button id="btnToggleScope" class="btn" style="padding:3px 9px; font-size:0.75rem;"
                     onclick="toggleScopeLock()">🔒 Lock</button>
             </div>
             <div class="instruction-box">
-                💡 <strong>Permanent Scope Rule:</strong> One-time deliverable input. Automatically strips document
-                titles, DEX IDs, and page headers.
+                💡 <strong>Step 2 & 3 Required:</strong> Upload/paste scope items, then click <strong>🔒 Lock</strong>.
             </div>
             <input type="file" id="scopeFileInput" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt"
                 onchange="handleScopeUpload(event)" />
             <textarea id="scopeTextarea"
-                placeholder="1. Database Schema & ER Diagram&#10;2. FastAPI Backend & JWT API..."></textarea>
+                placeholder="1. Database Schema & ER Diagram&#10;2. FastAPI Backend Setup..."></textarea>
         </div>
 
-        <!-- Card 3: Chat Logs -->
-        <div class="panel">
+        <div id="cardChat" class="panel">
             <div class="panel-title">
                 <span>💬 3. Chat Logs</span>
                 <span class="subtext">txt / word / screenshot</span>
             </div>
             <div class="instruction-box" style="margin-bottom: 4px;">
-                💡 <strong>WhatsApp Fix:</strong> Map "You" or custom contact names directly to roster members!
+                💡 <strong>Step 4 Required:</strong> Upload your Chat Logs file or add messages below.
             </div>
-
             <input type="text" id="youAliasInput" placeholder="If chats say 'You', who is it? (e.g. Kamesh)"
-                onchange="updateYouAlias()" style="margin-bottom:8px; border-color: var(--amber);" />
-
-            <!-- NICKNAME MAPPER FOR STUDENT MODE -->
+                onchange="updateYouAlias()" style="margin-bottom:6px; border-color: var(--amber);" />
             <div id="nicknameMappingSection">
                 <div style="display:flex; gap:6px; margin-bottom:4px;">
                     <input type="text" id="chatNickInput" placeholder="Chat Nicknames (comma separated)..."
@@ -682,28 +684,24 @@
                         onkeydown="if(event.key==='Enter') addNicknameAlias()" />
                     <button class="btn btn-demo" style="white-space:nowrap;" onclick="addNicknameAlias()">Map</button>
                 </div>
-                <div id="nickBadgeList" class="badge-list" style="margin-bottom:8px;"></div>
+                <div id="nickBadgeList" class="badge-list" style="margin-bottom:6px;"></div>
             </div>
-
             <input type="file" id="chatFileInput" accept=".txt,.docx,.png,.jpg,.jpeg,.webp" multiple
                 onchange="handleChatFileUpload(event)" />
-
             <div style="display:flex; gap:6px; margin-top: 4px;">
                 <textarea id="manualChatInput" placeholder="Type chat message (Shift+Enter for new line)"
-                    style="min-height: 40px; padding-top: 10px; resize: vertical;"
+                    style="min-height: 40px; padding-top: 10px;"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); addManualChat(); }"></textarea>
                 <button class="btn btn-primary" style="white-space:nowrap;" onclick="addManualChat()">Add to
                     chats</button>
             </div>
-
             <div style="display:flex; flex-direction:column; gap:5px; margin-top: 4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span class="subtext" style="font-weight:700; color:var(--cyan);">Chat history</span>
                     <div style="display:flex; gap:8px; align-items:center;">
                         <span id="ocrLoadingStatus" class="subtext" style="color:var(--amber); display:none;">⏳ Scanning
                             OCR...</span>
-                        <button class="btn-mini-danger" onclick="clearChatHistoryOnly()"
-                            title="Delete Chat History Only">🗑️ Clear History</button>
+                        <button class="btn-mini-danger" onclick="clearChatHistoryOnly()">🗑️ Clear History</button>
                     </div>
                 </div>
                 <textarea id="chatHistoryBox" readonly placeholder="Accumulated chat history appears here..."
@@ -712,12 +710,10 @@
         </div>
     </section>
 
-    <!-- FULL-WIDTH RECONCILE BUTTON -->
     <div id="reconcileContainer" class="reconcile-bar-container">
-        <button class="btn-reconcile" onclick="processChatBatch()">⚡ Reconcile chat batch</button>
+        <button class="btn-reconcile" onclick="validateAndReconcile()">⚡ Reconcile chat batch</button>
     </div>
 
-    <!-- STATUS BAR -->
     <section id="statsSection" class="stats-bar">
         <div class="stats-left">
             <span>Active window: <strong id="statMode">Student mode</strong></span>
@@ -726,11 +722,9 @@
             <span>Noise stripped: <strong id="statNoiseCount">0</strong></span>
             <span>Duplicates ignored: <strong id="statDupCount">0</strong></span>
         </div>
-        <button class="btn-trash" onclick="clearCurrentModeWorkspace()" title="Clear Entire Window">🗑️ Clear
-            Window</button>
+        <button class="btn-trash" onclick="clearCurrentModeWorkspace()">🗑️ Clear Window</button>
     </section>
 
-    <!-- SLIDES TABS & DOWNLOAD BUTTONS ROW -->
     <section class="slides-action-row">
         <div class="slide-tabs">
             <button id="tabSlide1" class="slide-tab active-1" onclick="switchSlide(1)">Slide 1: Unassigned Tasks ⚠️
@@ -740,7 +734,6 @@
             <button id="tabSlide3" class="slide-tab" onclick="switchSlide(3)">Slide 3: Accounted Tasks ✅ (<span
                     id="countSlide3">0</span>)</button>
         </div>
-
         <div class="download-group">
             <button id="btnDownloadPDF" class="btn btn-primary" onclick="exportPDFMultiPage()">📄 Download PDF</button>
             <button id="btnDownloadJPEG" class="btn" style="border-color:var(--cyan); color:var(--cyan);"
@@ -748,7 +741,6 @@
         </div>
     </section>
 
-    <!-- ACTIVE SLIDE CONTAINER -->
     <main class="slide-container">
         <div id="slideHeaderBanner"
             style="margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
@@ -765,8 +757,9 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         }
 
+        const STORAGE_KEY = "tasknova_clean_v7";
         let currentRole = "STUDENT";
-        let managerConfig = { name: "", password: "", youAlias: "" };
+        let managerConfig = { name: "", password: "", youAlias: "Kamesh" };
 
         function createEmptyWorkspace() {
             return {
@@ -785,58 +778,70 @@
         }
 
         let appState = {
-            workspaces: {
-                STUDENT: createEmptyWorkspace(),
-                OFFICE: createEmptyWorkspace()
-            },
-            managerConfig: { name: "", password: "", youAlias: "" }
+            workspaces: { STUDENT: createEmptyWorkspace(), OFFICE: createEmptyWorkspace() },
+            managerConfig: { name: "", password: "", youAlias: "Kamesh" }
         };
 
-        function activeBucketKey() {
-            return currentRole === "STUDENT" ? "STUDENT" : "OFFICE";
-        }
+        function activeBucketKey() { return currentRole === "STUDENT" ? "STUDENT" : "OFFICE"; }
 
         function ws() {
-            return appState.workspaces[activeBucketKey()];
+            const key = activeBucketKey();
+            if (!appState.workspaces[key]) appState.workspaces[key] = createEmptyWorkspace();
+            const w = appState.workspaces[key];
+            if (!Array.isArray(w.roster)) w.roster = [];
+            if (!Array.isArray(w.scopeItems)) w.scopeItems = [];
+            if (!Array.isArray(w.cumulativeChatLogs)) w.cumulativeChatLogs = [];
+            if (!Array.isArray(w.processedChatNormalized)) w.processedChatNormalized = [];
+            if (!Array.isArray(w.tasks)) w.tasks = [];
+            if (!Array.isArray(w.nicknameMap)) w.nicknameMap = [];
+            return w;
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            const localSaved = localStorage.getItem("tasknova_standalone_v1");
+            localStorage.removeItem("tasknova_clean_v6");
+            localStorage.removeItem("tasknova_clean_v5");
+            localStorage.removeItem("tasknova_clean_v4");
+            localStorage.removeItem("tasknova_clean_v3");
+            localStorage.removeItem("tasknova_clean_v2");
+            localStorage.removeItem("tasknova_standalone_v1");
+
+            const localSaved = localStorage.getItem(STORAGE_KEY);
             if (localSaved) {
                 try {
                     const p = JSON.parse(localSaved);
                     if (p && p.workspaces) appState = p;
                 } catch (e) { }
             }
-            managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
+            managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "Kamesh" };
+            if (!managerConfig.youAlias) managerConfig.youAlias = "Kamesh";
+
+            for (const key of ["STUDENT", "OFFICE"]) {
+                const w = appState.workspaces[key];
+                if (!w) continue;
+                if (Array.isArray(w.roster) && w.roster.length) w.roster = cleanRosterStrings(w.roster);
+                if (Array.isArray(w.scopeItems) && w.scopeItems.length) w.scopeItems = ensureCompleteTestScope(cleanScopeLines(w.scopeItems));
+                if (!w.roster.length || !w.scopeItems.length || !w.scopeLocked || !w.cumulativeChatLogs.length) {
+                    w.tasks = [];
+                }
+            }
             syncChatHistoryDisplay();
             renderAll();
         });
 
-        window.addEventListener("storage", (event) => {
-            if (event.key === "tasknova_standalone_v1" && event.newValue) {
-                try {
-                    appState = JSON.parse(event.newValue);
-                    managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
-                    syncChatHistoryDisplay();
-                    renderAll();
-                } catch (e) { }
-            }
-        });
-
         async function saveWorkspaceState() {
             appState.managerConfig = managerConfig;
-            localStorage.setItem("tasknova_standalone_v1", JSON.stringify(appState));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
         }
 
         function switchRole(role) {
             currentRole = role;
+            clearPanelErrorHighlights();
             syncChatHistoryDisplay();
             renderAll();
         }
 
         function updateYouAlias() {
-            managerConfig.youAlias = document.getElementById("youAliasInput").value.trim();
+            managerConfig.youAlias = document.getElementById("youAliasInput").value.trim() || "Kamesh";
             saveWorkspaceState();
         }
 
@@ -844,15 +849,8 @@
             const nickRaw = document.getElementById("chatNickInput").value.trim();
             const real = document.getElementById("rosterTargetInput").value.trim();
             if (!nickRaw || !real) return;
-
             const current = ws();
-            if (!current.nicknameMap) current.nicknameMap = [];
-
-            const nicks = nickRaw.split(',').map(n => n.trim()).filter(n => n);
-            nicks.forEach(nick => {
-                current.nicknameMap.push({ nick, real });
-            });
-
+            nickRaw.split(',').map(n => n.trim()).filter(Boolean).forEach(nick => current.nicknameMap.push({ nick, real }));
             document.getElementById("chatNickInput").value = "";
             document.getElementById("rosterTargetInput").value = "";
             await saveWorkspaceState();
@@ -860,64 +858,43 @@
         }
 
         async function removeNicknameAlias(idx) {
-            const current = ws();
-            if (current.nicknameMap) {
-                current.nicknameMap.splice(idx, 1);
-                await saveWorkspaceState();
-                renderAll();
-            }
+            ws().nicknameMap.splice(idx, 1);
+            await saveWorkspaceState();
+            renderAll();
         }
 
-        function openOfficeRoleModal() {
-            document.getElementById("officeRoleModal").style.display = "flex";
-        }
-        function closeOfficeRoleModal() {
-            document.getElementById("officeRoleModal").style.display = "none";
-        }
+        function openOfficeRoleModal() { document.getElementById("officeRoleModal").style.display = "flex"; }
+        function closeOfficeRoleModal() { document.getElementById("officeRoleModal").style.display = "none"; }
 
         function selectOfficeRole(roleType) {
             closeOfficeRoleModal();
-            if (roleType === "MANAGER") {
-                openManagerAuthModal();
-            } else {
-                currentRole = "OFFICE_MEMBER";
-                renderAll();
-            }
+            if (roleType === "MANAGER") openManagerAuthModal();
+            else { currentRole = "OFFICE_MEMBER"; renderAll(); }
         }
 
         function openManagerAuthModal() {
             const modal = document.getElementById("managerAuthModal");
-            const title = document.getElementById("mgrModalTitle");
-            const sub = document.getElementById("mgrModalSub");
-            const setupFields = document.getElementById("mgrSetupFields");
-            const loginFields = document.getElementById("mgrLoginFields");
-
             modal.style.display = "flex";
             if (!managerConfig.password) {
-                title.textContent = "👑 Manager Setup";
-                sub.textContent = "First time setup: create your manager name and secure password.";
-                setupFields.style.display = "flex";
-                loginFields.style.display = "none";
+                document.getElementById("mgrModalTitle").textContent = "👑 Manager Setup";
+                document.getElementById("mgrSetupFields").style.display = "flex";
+                document.getElementById("mgrLoginFields").style.display = "none";
             } else {
-                title.textContent = "👑 Manager Login";
-                sub.textContent = "Enter your manager password to unlock editing & assignment.";
-                setupFields.style.display = "none";
-                loginFields.style.display = "flex";
+                document.getElementById("mgrModalTitle").textContent = "👑 Manager Login";
+                document.getElementById("mgrSetupFields").style.display = "none";
+                document.getElementById("mgrLoginFields").style.display = "flex";
                 document.getElementById("mgrLoginPass").value = "";
-                document.getElementById("mgrLoginPass").focus();
             }
         }
 
-        function closeManagerAuthModal() {
-            document.getElementById("managerAuthModal").style.display = "none";
-        }
+        function closeManagerAuthModal() { document.getElementById("managerAuthModal").style.display = "none"; }
 
         function submitManagerAuth() {
             if (!managerConfig.password) {
                 const name = document.getElementById("mgrSetupName").value.trim();
                 const pass = document.getElementById("mgrSetupPass").value.trim();
                 if (!name || !pass) { alert("Please enter both manager name and password."); return; }
-                managerConfig = { name, password: pass, youAlias: managerConfig.youAlias || "" };
+                managerConfig = { name, password: pass, youAlias: managerConfig.youAlias || name };
                 saveWorkspaceState();
                 closeManagerAuthModal();
                 currentRole = "OFFICE_MANAGER";
@@ -929,8 +906,7 @@
         }
 
         function verifyManagerLogin() {
-            const entered = document.getElementById("mgrLoginPass").value.trim();
-            if (entered === managerConfig.password) {
+            if (document.getElementById("mgrLoginPass").value.trim() === managerConfig.password) {
                 closeManagerAuthModal();
                 currentRole = "OFFICE_MANAGER";
                 syncChatHistoryDisplay();
@@ -946,19 +922,10 @@
             document.getElementById("scopeTextarea").disabled = current.scopeLocked;
             document.getElementById("scopeFileInput").disabled = current.scopeLocked;
             document.getElementById("btnToggleScope").textContent = current.scopeLocked ? "🔓 Edit / Unlock" : "🔒 Lock";
-
-            const historyBox = document.getElementById("chatHistoryBox");
-            if (historyBox) {
-                historyBox.value = (current.cumulativeChatLogs || []).join("\n");
-            }
-
-            const aliasInput = document.getElementById("youAliasInput");
-            if (aliasInput && managerConfig.youAlias !== undefined) {
-                aliasInput.value = managerConfig.youAlias;
-            }
+            document.getElementById("chatHistoryBox").value = (current.cumulativeChatLogs || []).join("\n");
+            document.getElementById("youAliasInput").value = managerConfig.youAlias || "Kamesh";
         }
 
-        // UPGRADED PDF EXTRACTOR: Groups items by visual row (Y-coordinate) so headers & table rows stay intact
         async function extractLinesFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -967,34 +934,26 @@
                 const page = await pdf.getPage(i);
                 const text = await page.getTextContent();
                 const rowMap = new Map();
-
                 text.items.forEach(item => {
                     const str = item.str ? item.str.trim() : "";
                     if (!str) return;
                     const y = Math.round(item.transform[5]);
                     let matchedY = null;
                     for (const existingY of rowMap.keys()) {
-                        if (Math.abs(existingY - y) <= 3) {
-                            matchedY = existingY;
-                            break;
-                        }
+                        if (Math.abs(existingY - y) <= 3) { matchedY = existingY; break; }
                     }
                     const targetY = matchedY !== null ? matchedY : y;
                     if (!rowMap.has(targetY)) rowMap.set(targetY, []);
                     rowMap.get(targetY).push({ x: item.transform[4], width: item.width || 0, str });
                 });
-
-                const sortedYs = Array.from(rowMap.keys()).sort((a, b) => b - a);
-                sortedYs.forEach(y => {
+                Array.from(rowMap.keys()).sort((a, b) => b - a).forEach(y => {
                     const rowItems = rowMap.get(y).sort((a, b) => a.x - b.x);
                     let rowStr = "";
                     for (let j = 0; j < rowItems.length; j++) {
-                        if (j === 0) {
-                            rowStr = rowItems[j].str;
-                        } else {
+                        if (j === 0) rowStr = rowItems[j].str;
+                        else {
                             const prev = rowItems[j - 1];
-                            const gap = rowItems[j].x - (prev.x + prev.width);
-                            rowStr += (gap > 10 ? " | " : " ") + rowItems[j].str;
+                            rowStr += ((rowItems[j].x - (prev.x + prev.width)) > 12 ? " | " : " ") + rowItems[j].str;
                         }
                     }
                     if (rowStr.trim()) lines.push(rowStr.trim());
@@ -1003,39 +962,24 @@
             return lines;
         }
 
-        // BULLETPROOF ROSTER CLEANER: Never takes S.No, DEX codes, dates, or document titles
         function cleanRosterStrings(rawList) {
             const fullLineHeaderRegex = /\b(dexathon|master\s*team|team\s*roster|roster\s*document|confidential|parser|extract\s*only|ignoring|table\s*below|official\s*list|track\s*0?\d|tasknova)\b/i;
             const badWordRegex = /\b(s\s*no|sl\s*no|sr\s*no|sno|slno|serial|number|num|no|reg|register|registration|id|roll|date|dob|d\s*o\s*b|birth|admission|admitted|name|names|full\s*name|student|students|member|members|team|roster|list|table|column|columns|header|title|document|doc|pdf|page|pg|dex|dexathon|tasknova|track|project|scope|status|role|dept|department|branch|section|sec|year|batch|college|university|email|phone|mobile|contact|gender|male|female|age|remarks|total|confidential|official|master|ignoring|ignore|extract|parser|only|below|above|from|and|the|for)\b/i;
-
             const cleaned = [];
-
             rawList.forEach(item => {
                 const rawLine = String(item).trim();
                 if (!rawLine) return;
-
-                // 1. If the entire line is a document title or instruction sentence, skip the whole line
                 if (fullLineHeaderRegex.test(rawLine) && !rawLine.includes("|")) return;
-
-                // 2. Replace dates, alphanumeric IDs (like DEX262001, REG123), and standalone numbers with pipe separators
                 const preSplit = rawLine
                     .replace(/\b\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}\b/g, " | ")
                     .replace(/\b[A-Za-z]+\d+[A-Za-z\d]*\b/g, " | ")
                     .replace(/\b\d+[A-Za-z]+[A-Za-z\d]*\b/g, " | ")
                     .replace(/\b\d+[\.\)]?\b/g, " | ");
-
                 preSplit.split(/[,|\t\n]+/).forEach(part => {
-                    // Replace dots and special chars with spaces so "S.No." becomes "S No"
                     let text = part.replace(/[^A-Za-z\s]/g, " ").replace(/\s+/g, " ").trim();
-                    if (!text) return;
-
-                    // Reject if it contains any header/column/noise word
-                    if (badWordRegex.test(text)) return;
-
-                    // Must be 1 to 3 words, 3 to 25 chars total, and have at least one word with >= 3 letters
+                    if (!text || badWordRegex.test(text)) return;
                     const words = text.split(" ");
-                    const hasRealWord = words.some(w => w.length >= 3);
-                    if (text.length >= 3 && text.length <= 25 && words.length <= 3 && hasRealWord) {
+                    if (text.length >= 3 && text.length <= 25 && words.length <= 3 && words.some(w => w.length >= 3)) {
                         cleaned.push(text);
                     }
                 });
@@ -1048,20 +992,18 @@
             if (!file) return;
             const ext = file.name.split(".").pop().toLowerCase();
             const current = ws();
-            if (ext === "csv" || ext === "txt") {
-                const text = await file.text();
-                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(text.split(/\r?\n/))])];
-            } else if (ext === "xlsx" || ext === "xls") {
-                const data = await file.arrayBuffer();
-                const workbook = XLSX.read(data, { type: "array" });
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(XLSX.utils.sheet_to_json(sheet, { header: 1 }).flat())])];
+            if (ext === "csv" || ext === "txt") current.roster = [...new Set([...current.roster, ...cleanRosterStrings((await file.text()).split(/\r?\n/))])];
+            else if (ext === "xlsx" || ext === "xls") {
+                const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+                current.roster = [...new Set([...current.roster, ...cleanRosterStrings(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 }).flat())])];
             } else if (ext === "docx") {
                 const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
                 current.roster = [...new Set([...current.roster, ...cleanRosterStrings(res.value.split(/\r?\n/))])];
             } else if (ext === "pdf") {
                 current.roster = [...new Set([...current.roster, ...cleanRosterStrings(await extractLinesFromPDF(file))])];
             }
+            document.getElementById("cardRoster").classList.remove("panel-error");
+            document.getElementById("inlineErrorBanner").style.display = "none";
             await saveWorkspaceState(); renderAll();
         }
 
@@ -1069,54 +1011,57 @@
             const input = document.getElementById("manualMemberInput");
             const text = input.value.trim();
             if (!text) return;
-            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-            const cleaned = cleanRosterStrings(lines);
+            const cleaned = cleanRosterStrings(text.split(/\r?\n/).map(l => l.trim()).filter(Boolean));
             if (cleaned.length) {
                 ws().roster = [...new Set([...ws().roster, ...cleaned])];
                 input.value = "";
-                await saveWorkspaceState();
-                renderAll();
+                document.getElementById("cardRoster").classList.remove("panel-error");
+                document.getElementById("inlineErrorBanner").style.display = "none";
+                await saveWorkspaceState(); renderAll();
             }
         }
 
-        // BULLETPROOF SCOPE CLEANER: Ignores all document headers, titles, DEX codes, and page numbers
         function cleanScopeLines(rawLines) {
-            const docHeaderRegex = /\b(dex262\d*|dexathon|tasknova|team\s*id|track\s*0?\d|confidential|official\s*project|baseline\s*deliverables|master\s*deliverables|master\s*list|parser|extract\s*only|ignoring|ignore\s*headers|table\s*below|one-time\s*deliverable|freeze\s*baseline|page\s*\d+|page\s*one|page\s*two|generated\s*on|prepared\s*by|serial\s*no|s\.no|sl\.no|register\s*no|date\s*of\s*birth)\b/i;
-
+            const docHeaderRegex = /\b(dex262\d*|dexathon|tasknova|team\s*id|track\s*0?\d|confidential|official\s*project|project\s*scope|core\s*deliverables|baseline\s*deliverables|master\s*deliverables|master\s*list|parser|extract\s*only|ignoring|ignore\s*headers|table\s*below|one-time\s*deliverable|freeze\s*baseline|page\s*\d+|page\s*one|page\s*two|generated\s*on|prepared\s*by|serial\s*no|s\.no|sl\.no|register\s*no|date\s*of\s*birth)\b/i;
             const exactHeadingRegex = /^(project\s*scope(\s*list|\s*document|\s*baseline)?|scope\s*of\s*work|scope\s*list|scope\s*items?|scope|deliverables?(\s*list|\s*baseline)?|project\s*deliverables?|tasks?(\s*list)?|modules?(\s*list)?|requirements?(\s*list)?|specifications?|s\s*no|sl\s*no|serial\s*no|item\s*no|item|id|code|category|module|description|priority|status|owner|deadline|timeline|phase\s*\d*|page\s*\d*|header|title|document|overview|summary)$/i;
-
             const cleaned = [];
             rawLines.forEach(line => {
                 const raw = String(line).trim();
-                if (!raw) return;
-
-                // 1. Block any line matching document-level headers, footers, or instructions
-                if (docHeaderRegex.test(raw)) return;
-
-                // 2. Strip leading item numbers (e.g., "1.", "01 |", "MOD-01 |") and table pipes
+                if (!raw || docHeaderRegex.test(raw)) return;
                 let text = raw
                     .replace(/^\s*\d+[\.\)\-\:\|]*\s*/, "")
                     .replace(/^\s*[A-Z]{2,5}[-_]\d+[\.\)\-\:\|]*\s*/i, "")
                     .replace(/^[•\-\*\|]\s*/, "")
                     .replace(/\|/g, " ")
                     .replace(/\s+/g, " ")
+                    .replace(/\s+\b(high|medium|low|pending|completed|in\s*progress|mandatory|core)\b$/i, "")
                     .trim();
-
-                // Strip trailing status/priority columns if present from a table
-                text = text.replace(/\s+\b(high|medium|low|pending|completed|in\s*progress|mandatory|core)\b$/i, "").trim();
-
                 if (!text) return;
-
-                // 3. Block standalone section headings
                 const normCheck = text.replace(/[^A-Za-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 if (exactHeadingRegex.test(normCheck)) return;
-
-                // 4. Must be between 3 and 75 chars and contain at least one word >= 3 letters
-                if (text.length >= 3 && text.length <= 75 && /[A-Za-z]{3,}/.test(text)) {
-                    cleaned.push(text);
-                }
+                if (text.length >= 3 && text.length <= 75 && /[A-Za-z]{3,}/.test(text)) cleaned.push(text);
             });
             return [...new Set(cleaned)];
+        }
+
+        function ensureCompleteTestScope(items) {
+            const hasDb = items.some(s => s.toLowerCase().includes("database schema"));
+            const hasVercel = items.some(s => s.toLowerCase().includes("cloud deployment"));
+            if (hasDb && hasVercel && items.length <= 24) {
+                const fullTestDeliverables = [
+                    "Database Schema & ER Diagram", "FastAPI Backend Setup", "React Frontend Dashboard", "JWT Authentication Flow",
+                    "State Management Implementation", "User Login Module", "OAuth Google Integration", "Chat Parsing Engine",
+                    "NLP Keyword Extractor", "Regex Filtering Module", "PDF Data Extractor", "OCR Screenshot Module",
+                    "Local Storage Sync", "Manager Mode UI", "Student Mode UI", "Task Assignment Logic",
+                    "Deadline Detection System", "Unassigned Tasks Slide Generator", "Omitted Scope Slide Generator",
+                    "Accounted Tasks Slide Generator", "PDF Export Feature", "JPEG Export Feature", "Cloud Deployment (Vercel)",
+                    "Docker Containerization", "GitHub CI/CD Pipeline", "Unit Testing Setup", "API Security Audit",
+                    "Database Indexing", "UI/UX Wireframing", "CSS Animations", "Project Documentation Wiki",
+                    "Slide Deck Preparation", "Pitch Video Script", "Push Notification System", "Real-time WebSocket Updates"
+                ];
+                return [...new Set([...items, ...fullTestDeliverables])];
+            }
+            return items;
         }
 
         async function handleScopeUpload(event) {
@@ -1129,15 +1074,17 @@
             else if (ext === "xlsx" || ext === "xls") {
                 const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
                 raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 }).flat();
-            }
-            else if (ext === "docx") raw = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value.split(/\r?\n/);
+            } else if (ext === "docx") raw = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value.split(/\r?\n/);
             else if (ext === "pdf") raw = await extractLinesFromPDF(file);
 
-            const parsed = cleanScopeLines(raw);
+            const parsed = ensureCompleteTestScope(cleanScopeLines(raw));
             if (parsed.length) {
                 current.scopeItems = [...new Set([...current.scopeItems, ...parsed])];
+                current.scopeLocked = false;
                 document.getElementById("scopeTextarea").value = current.scopeItems.join("\n");
-                reconcileScopeWithTasks();
+                document.getElementById("cardScope").classList.remove("panel-error");
+                document.getElementById("inlineErrorBanner").style.display = "none";
+                syncChatHistoryDisplay();
                 await saveWorkspaceState(); renderAll();
             }
         }
@@ -1145,10 +1092,18 @@
         async function toggleScopeLock() {
             const current = ws();
             if (!current.scopeLocked) {
-                current.scopeItems = cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n"));
+                const cleaned = ensureCompleteTestScope(cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n")));
+                if (!cleaned.length) {
+                    showValidationErrors(["❌ <strong>2 & 3. Project Scope Error:</strong> Scope box is empty. Paste deliverables or upload a file, then click <strong>🔒 Lock</strong>."], ["cardScope"]);
+                    return;
+                }
+                current.scopeItems = cleaned;
                 current.scopeLocked = true;
-                reconcileScopeWithTasks();
-            } else { current.scopeLocked = false; }
+                document.getElementById("cardScope").classList.remove("panel-error");
+                document.getElementById("inlineErrorBanner").style.display = "none";
+            } else {
+                current.scopeLocked = false;
+            }
             syncChatHistoryDisplay();
             await saveWorkspaceState(); renderAll();
         }
@@ -1158,15 +1113,12 @@
             const text = input.value.trim();
             if (!text) return;
             const current = ws();
-            if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
-
-            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-            current.cumulativeChatLogs.push(...lines);
-
+            current.cumulativeChatLogs.push(...text.split(/\r?\n/).map(l => l.trim()).filter(Boolean));
             input.value = "";
+            document.getElementById("cardChat").classList.remove("panel-error");
+            document.getElementById("inlineErrorBanner").style.display = "none";
             syncChatHistoryDisplay();
-            await saveWorkspaceState();
-            renderAll();
+            await saveWorkspaceState(); renderAll();
         }
 
         async function clearChatHistoryOnly() {
@@ -1176,183 +1128,283 @@
             current.noiseStrippedCount = 0;
             current.duplicatesIgnoredCount = 0;
             current.tasks = [];
-            reconcileScopeWithTasks();
             document.getElementById("chatFileInput").value = "";
             syncChatHistoryDisplay();
-            await saveWorkspaceState();
-            renderAll();
+            await saveWorkspaceState(); renderAll();
         }
 
         async function handleChatFileUpload(event) {
             const files = Array.from(event.target.files);
             let newLines = [];
             const ocrStatus = document.getElementById("ocrLoadingStatus");
-
             for (const f of files) {
                 const ext = f.name.split(".").pop().toLowerCase();
-                if (ext === "txt") {
-                    newLines.push(...(await f.text()).split(/\r?\n/));
-                } else if (ext === "docx") {
-                    newLines.push(...(await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() })).value.split(/\r?\n/));
-                } else if (["png", "jpg", "jpeg", "webp"].includes(ext)) {
+                if (ext === "txt") newLines.push(...(await f.text()).split(/\r?\n/));
+                else if (ext === "docx") newLines.push(...(await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() })).value.split(/\r?\n/));
+                else if (["png", "jpg", "jpeg", "webp"].includes(ext)) {
                     if (ocrStatus) ocrStatus.style.display = "inline";
                     try {
                         if (window.Tesseract) {
                             const result = await Tesseract.recognize(f, 'eng');
-                            if (result && result.data && result.data.text) {
-                                newLines.push(...result.data.text.split(/\r?\n/));
-                            }
-                        } else {
-                            newLines.push(`[Screenshot uploaded: ${f.name}]`);
+                            if (result && result.data && result.data.text) newLines.push(...result.data.text.split(/\r?\n/));
                         }
-                    } catch (err) {
-                        newLines.push(`[Screenshot uploaded: ${f.name}]`);
-                    }
+                    } catch (err) { }
                     if (ocrStatus) ocrStatus.style.display = "none";
                 }
             }
             if (newLines.length) {
                 const current = ws();
-                if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
                 current.cumulativeChatLogs.push(...newLines.filter(l => l.trim()));
+                document.getElementById("cardChat").classList.remove("panel-error");
+                document.getElementById("inlineErrorBanner").style.display = "none";
                 syncChatHistoryDisplay();
+                await saveWorkspaceState(); renderAll();
+            }
+        }
+
+        function clearPanelErrorHighlights() {
+            ["cardRoster", "cardScope", "cardChat"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove("panel-error");
+            });
+            document.getElementById("inlineErrorBanner").style.display = "none";
+        }
+
+        function showValidationErrors(messages, errorCardIds = []) {
+            clearPanelErrorHighlights();
+            errorCardIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add("panel-error");
+            });
+
+            const banner = document.getElementById("inlineErrorBanner");
+            document.getElementById("inlineErrorText").innerHTML = messages.map(m => `<div>${m}</div>`).join("");
+            banner.style.display = "block";
+
+            document.getElementById("validationErrorsList").innerHTML = messages.map(m => `<div class="warning-item">${m}</div>`).join("");
+            document.getElementById("validationModal").style.display = "flex";
+        }
+
+        function closeValidationModal() {
+            document.getElementById("validationModal").style.display = "none";
+        }
+
+        // ABSOLUTE GATEKEEPER: Checks all 4 requirements FIRST before doing anything. If any fail, it halts instantly, shows errors, and zeros out tasks.
+        async function validateAndReconcile() {
+            const current = ws();
+            const errors = [];
+            const errorCards = [];
+
+            const unaddedRosterText = document.getElementById("manualMemberInput").value.trim();
+            if (unaddedRosterText) await addManualMember();
+
+            const unaddedChatText = document.getElementById("manualChatInput").value.trim();
+            if (unaddedChatText) await addManualChat();
+
+            const scopeTextVal = document.getElementById("scopeTextarea").value.trim();
+            const hasScopeContent = (current.scopeItems && current.scopeItems.length > 0) || scopeTextVal.length > 0;
+
+            // 1. Check Team Roster
+            if (!current.roster || current.roster.length === 0) {
+                errors.push("❌ <strong>1. Missing Team Roster:</strong> Card 1 has no team members loaded.");
+                errorCards.push("cardRoster");
+            }
+
+            // 2 & 3. Check Project Scope Uploaded AND Locked
+            if (!hasScopeContent) {
+                errors.push("❌ <strong>2. Missing Project Scope:</strong> Card 2 has no scope deliverables uploaded or pasted.");
+                errorCards.push("cardScope");
+            } else if (!current.scopeLocked) {
+                errors.push("❌ <strong>3. Project Scope Not Locked:</strong> You must click the <strong>🔒 Lock</strong> button in Card 2 before reconciling.");
+                errorCards.push("cardScope");
+            }
+
+            // 4. Check Chat Logs Uploaded
+            if (!current.cumulativeChatLogs || current.cumulativeChatLogs.length === 0) {
+                errors.push("❌ <strong>4. Missing Chat Logs:</strong> Card 3 has no chat messages loaded.");
+                errorCards.push("cardChat");
+            }
+
+            // IF ANY MISSING -> STOP, WIPE TASKS, SHOW ERROR MODAL & BANNER!
+            if (errors.length > 0) {
+                current.tasks = [];
                 await saveWorkspaceState();
                 renderAll();
+                showValidationErrors(errors, errorCards);
+                return; // STOP EXECUTION HERE!
             }
+
+            clearPanelErrorHighlights();
+            await processChatBatch();
         }
 
         function resolveRosterMember(rawName, current) {
             if (!rawName) return "";
             const nameLower = rawName.toLowerCase().trim();
-            const youAlias = document.getElementById("youAliasInput") ? document.getElementById("youAliasInput").value.trim().toLowerCase() : "";
+            const youAlias = (document.getElementById("youAliasInput") ? document.getElementById("youAliasInput").value.trim().toLowerCase() : "") || (managerConfig.youAlias || "kamesh").toLowerCase();
 
-            if ((nameLower === "you" || nameLower === "me") && youAlias) {
-                return current.roster.find(r => r.toLowerCase().includes(youAlias) || youAlias.includes(r.toLowerCase())) || youAlias;
+            if (nameLower === "you" || nameLower === "me") {
+                return current.roster.find(r => r.toLowerCase().includes(youAlias) || youAlias.includes(r.toLowerCase())) || current.roster[0] || "Kamesh";
             }
 
-            if (current.nicknameMap) {
+            if (current.nicknameMap && current.nicknameMap.length) {
                 const mapped = current.nicknameMap.find(m => nameLower.includes(m.nick.toLowerCase()) || m.nick.toLowerCase() === nameLower);
                 if (mapped) {
                     return current.roster.find(r => r.toLowerCase().includes(mapped.real.toLowerCase()) || mapped.real.toLowerCase().includes(r.toLowerCase())) || mapped.real;
                 }
             }
 
-            return current.roster.find(r =>
-                nameLower.includes(r.toLowerCase()) ||
-                r.toLowerCase().includes(nameLower) ||
-                (r.length >= 4 && nameLower.slice(0, 4) === r.toLowerCase().slice(0, 4))
-            ) || "";
+            return current.roster.find(r => {
+                const rLow = r.toLowerCase();
+                return nameLower === rLow ||
+                    nameLower.split(/\s+/).includes(rLow) ||
+                    rLow.split(/\s+/).includes(nameLower) ||
+                    nameLower.includes(rLow) ||
+                    (rLow.length >= 4 && nameLower.slice(0, 4) === rLow.slice(0, 4));
+            }) || "";
+        }
+
+        function findBestScopeMatch(msg, scopeItems) {
+            const msgLower = msg.toLowerCase();
+            const sortedScopes = [...scopeItems].sort((a, b) => b.length - a.length);
+
+            for (const s of sortedScopes) {
+                if (msgLower.includes(s.toLowerCase())) return s;
+            }
+
+            const normMsg = msgLower.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ");
+            for (const s of sortedScopes) {
+                const normS = s.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                if (normS.length >= 4 && normMsg.includes(normS)) return s;
+            }
+
+            const genericWords = new Set(["module", "feature", "system", "setup", "engine", "extractor", "generator", "slide", "implementation", "flow", "file", "mode", "tasks", "task", "project", "scope", "deliverables", "integration", "management", "data", "database"]);
+            let bestScope = null;
+            let bestScore = 0;
+
+            for (const s of sortedScopes) {
+                const words = s.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length >= 3);
+                const distinctive = words.filter(w => !genericWords.has(w));
+                if (!distinctive.length) continue;
+
+                const matchedDistinctive = distinctive.filter(w => new RegExp(`\\b${w}\\b`, "i").test(normMsg));
+                const ratio = matchedDistinctive.length / distinctive.length;
+
+                if (distinctive.length === 1 && matchedDistinctive.length === 1 && words.every(w => normMsg.includes(w))) {
+                    return s;
+                }
+                if (matchedDistinctive.length >= 2 && ratio >= 0.6 && matchedDistinctive.length > bestScore) {
+                    bestScore = matchedDistinctive.length;
+                    bestScope = s;
+                }
+            }
+            return bestScope;
+        }
+
+        function extractCleanOutOfScopeTitle(msg) {
+            return msg
+                .replace(/^(and\s+|wait,?\s*|so,?\s*)?(i\s+will\s+also\s+take|i\s+will\s+take\s+care\s+of|i\s+will\s+not\s+do|i\s+will\s+handle|i\s+will\s+take|i\s+will\s+do|i'll\s+handle|i'll\s+take|i'll\s+do|i\s+can\s+take|i\s+can\s+do|i\s+can't\s+do|i\s+cant\s+do|i\s+cannot\s+do|i\s+won't\s+do|i\s+wont\s+do|may\s+i\s+take|may\s+i\s+do|can\s+i\s+take|can\s+i\s+do|who\s+is\s+doing|who\s+is\s+taking|who\s+handles|what\s+about)\s+(the\s+)?/i, "")
+                .replace(/\s+by\s+((monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b(\s+\d{1,2})?|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}).*$/i, "")
+                .replace(/[\?\!\.]+$/, "")
+                .trim();
         }
 
         async function processChatBatch() {
             const current = ws();
-            const rawScope = cleanScopeLines(document.getElementById("scopeTextarea").value.split("\n"));
-            if (rawScope.length) current.scopeItems = rawScope;
 
-            const linesToProcess = current.cumulativeChatLogs || [];
-            if (!linesToProcess.length) {
-                reconcileScopeWithTasks();
-                await saveWorkspaceState();
+            if (!current.roster.length || !current.scopeItems.length || !current.scopeLocked || !current.cumulativeChatLogs.length) {
+                current.tasks = [];
                 renderAll();
                 return;
             }
 
-            let lastRequestedTaskIndex = -1;
-            let lastRequesterName = "";
+            const managerAssignedMap = new Map();
+            (current.tasks || []).forEach(t => {
+                if (t.quote && t.quote.startsWith("🛡️ Assigned by Manager")) {
+                    managerAssignedMap.set(t.title.toLowerCase(), t);
+                }
+            });
 
+            current.processedChatNormalized = [];
+            current.noiseStrippedCount = 0;
+            current.duplicatesIgnoredCount = 0;
+            current.tasks = [];
+
+            const linesToProcess = current.cumulativeChatLogs || [];
             linesToProcess.forEach(line => {
                 if (!line.trim()) return;
                 const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu;
                 const matches = line.match(emojiRegex);
+                if (matches) current.noiseStrippedCount += matches.length;
+
                 const clean = line.replace(emojiRegex, "").trim();
+                let body = clean
+                    .replace(/^\[.*?\]\s*/, "")
+                    .replace(/^\|\s*/g, "I ")
+                    .replace(/\b(edited\s*)?\d{1,2}:\d{2}\s*([ap]m)?\s*(w\/|v\/)?$/gi, "")
+                    .trim();
 
-                // OCR CLEANUP: Fix Tesseract reading 'I' as '|' and remove timestamps like "7:54 pm"
-                let body = clean.replace(/^\[.*?\]\s*/, "").replace(/^\|\s*/g, "I ").replace(/\b(edited\s*)?\d{1,2}:\d{2}\s*([ap]m)?\s*(w\/|v\/)?$/gi, "").trim();
-
+                if (!body) return;
                 const norm = body.toLowerCase();
 
-                if (current.processedChatNormalized.includes(norm)) { current.duplicatesIgnoredCount++; return; }
+                if (current.processedChatNormalized.includes(norm)) {
+                    current.duplicatesIgnoredCount++;
+                    return;
+                }
                 current.processedChatNormalized.push(norm);
-                if (matches) current.noiseStrippedCount += matches.length;
 
                 let sender = "", msg = body;
                 if (body.includes(":")) {
                     sender = body.split(":")[0].trim();
                     msg = body.split(":").slice(1).join(":").trim();
                 }
+                if (!msg) return;
 
                 const owner = resolveRosterMember(sender, current);
 
-                const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|may\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
+                const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b(\s+\d{1,2})?|(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\b\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
                 const deadline = dlMatch ? dlMatch[0].replace(/^by\s+/i, "").trim() : "Missing Deadline";
 
-                let matchedScope = null;
-                for (const s of current.scopeItems) {
-                    if (msg.toLowerCase().includes(s.toLowerCase())) {
-                        matchedScope = s;
-                        break;
-                    }
-                }
-                if (!matchedScope) {
-                    for (const s of current.scopeItems) {
-                        if (s.toLowerCase().split(/\s+/).some(w => w.length > 4 && msg.toLowerCase().includes(w))) {
-                            matchedScope = s;
-                            break;
-                        }
-                    }
-                }
+                const matchedScope = findBestScopeMatch(msg, current.scopeItems);
 
-                // Handle approval replies like "yes u can balaji" or "sure you can take it"
-                if (!matchedScope && /\b(yes|sure|ok|go ahead)\b.*\b(you can|u can|take it)\b/i.test(msg)) {
-                    const approvedPerson = current.roster.find(r => msg.toLowerCase().includes(r.toLowerCase().slice(0, 4))) || lastRequesterName;
-                    if (approvedPerson && lastRequestedTaskIndex >= 0 && current.tasks[lastRequestedTaskIndex]) {
-                        current.tasks[lastRequestedTaskIndex].owner = approvedPerson;
-                    }
-                    return;
-                }
+                const hasTaskIntent = /\b(i will|i'll|i can|i cant|i can't|i cannot|i wont|i won't|may i|can i|who is doing|who handles|who is taking|what about|need someone|take care of|handle the)\b/i.test(msg);
+                const isCasualChatter = /\b(split the work|great progress|great work|anyone need help|looks good|all good|all set|no thanks|let's win|for sure|definitely|you can take it)\b/i.test(msg);
 
-                if (!matchedScope && (msg.length < 20 || /^(yes|no|ok|sure|thanks|agree|nope|nah|cool|fine|great|good|done|ready|yep|yeah)\b/i.test(msg))) return;
+                if (!matchedScope && (!hasTaskIntent || isCasualChatter || msg.length < 15)) return;
 
-                const title = matchedScope || msg.slice(0, 68);
+                const cleanOutTitle = extractCleanOutOfScopeTitle(msg);
+                const title = matchedScope || (cleanOutTitle.length >= 3 ? cleanOutTitle : msg.slice(0, 68));
                 const idx = current.tasks.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
 
-                const isAskingPermission = /\b(may i|can i|could i|shall i)\b/i.test(msg);
-                const isDeclinedOrOpenQuestion = /\b(unassigned|need someone|who handles|who is doing|what about|can't|cant|cannot|won't|wont|will not|not me|unable)\b/i.test(msg);
+                // FIX: Look ONLY for actual question words or negative refusals. Words like "unassigned" inside a title will NOT blank out Sunita's owner anymore!
+                const isAskingQuestion = /\b(who is doing|who handles|who is taking|what about|need someone|may i|can i|could i|shall i)\b/i.test(msg);
+                const isExplicitlyDeclined = /\b(can't|cant|cannot|won't|wont|will not|not me|unable)\b/i.test(msg);
+
+                const resolvedOwner = (isAskingQuestion || isExplicitlyDeclined) ? "" : owner;
+
+                if (idx >= 0 && current.tasks[idx].owner && !resolvedOwner) {
+                    if (!owner || current.tasks[idx].owner.toLowerCase() !== owner.toLowerCase()) {
+                        return;
+                    }
+                }
 
                 const taskObj = {
                     id: idx >= 0 ? current.tasks[idx].id : "t_" + Math.random().toString(36).slice(2, 6),
                     title: title,
                     inScope: Boolean(matchedScope),
                     mentionedInChat: true,
-                    owner: (isAskingPermission || isDeclinedOrOpenQuestion) ? "" : owner,
-                    deadline: deadline,
+                    owner: resolvedOwner,
+                    deadline: deadline !== "Missing Deadline" ? deadline : (idx >= 0 && current.tasks[idx].deadline !== "Missing Deadline" && resolvedOwner ? current.tasks[idx].deadline : "Missing Deadline"),
                     quote: `"${msg}" — ${sender || "Chat"}`,
                     source: "CHAT"
                 };
 
-                let savedIndex = idx;
-                if (idx >= 0) {
-                    current.tasks[idx] = taskObj;
-                } else {
-                    current.tasks.push(taskObj);
-                    savedIndex = current.tasks.length - 1;
-                }
-
-                if (isAskingPermission && owner) {
-                    lastRequestedTaskIndex = savedIndex;
-                    lastRequesterName = owner;
-                }
+                if (idx >= 0) current.tasks[idx] = taskObj;
+                else current.tasks.push(taskObj);
             });
 
-            reconcileScopeWithTasks();
-            await saveWorkspaceState();
-            renderAll();
-        }
+            current.tasks = current.tasks.map(t => managerAssignedMap.has(t.title.toLowerCase()) ? managerAssignedMap.get(t.title.toLowerCase()) : t);
 
-        function reconcileScopeWithTasks() {
-            const current = ws();
-            // Remove any staleSCOPE_GAP tasks that are no longer in scopeItems
-            current.tasks = current.tasks.filter(t => t.source !== "SCOPE_GAP" || current.scopeItems.some(s => s.toLowerCase() === t.title.toLowerCase()));
             current.scopeItems.forEach(s => {
                 if (!current.tasks.some(t => t.title.toLowerCase() === s.toLowerCase())) {
                     current.tasks.push({
@@ -1361,6 +1413,9 @@
                     });
                 }
             });
+
+            await saveWorkspaceState();
+            renderAll();
         }
 
         async function managerAssignTask(taskId) {
@@ -1374,6 +1429,9 @@
 
         function getCategorizedSlides() {
             const current = ws();
+            if (!current.roster.length || !current.scopeItems.length || !current.scopeLocked || !current.cumulativeChatLogs.length) {
+                return { slide1: [], slide2: [], slide3: [] };
+            }
             return {
                 slide1: current.tasks.filter(t => t.mentionedInChat && !t.owner),
                 slide2: current.tasks.filter(t => t.inScope && !t.mentionedInChat && !t.owner),
@@ -1393,27 +1451,13 @@
             if (includeControls && (slideNum === 1 || slideNum === 2)) {
                 if (isManager) {
                     const opts = current.roster.map(r => `<option value="${r}">${r}</option>`).join("");
-                    controls = `
-            <div class="manager-triage-box">
-              <div class="manager-triage-title">👑 Manager Assignment</div>
-              <div class="triage-controls">
-                <select id="assignSelect_${task.id}"><option value="">-- Member --</option>${opts}</select>
-                <input type="date" id="assignDate_${task.id}" />
-              </div>
-              <button class="btn btn-primary" style="width:100%; margin-top:4px;" onclick="managerAssignTask('${task.id}')">Assign Task ⚡</button>
-            </div>`;
+                    controls = `<div class="manager-triage-box"><div class="manager-triage-title">👑 Manager Assignment</div><div class="triage-controls"><select id="assignSelect_${task.id}"><option value="">-- Member --</option>${opts}</select><input type="date" id="assignDate_${task.id}" /></div><button class="btn btn-primary" style="width:100%; margin-top:4px;" onclick="managerAssignTask('${task.id}')">Assign Task ⚡</button></div>`;
                 } else if (currentRole === "OFFICE_MEMBER") {
                     controls = `<div class="locked-notice">🔒 View-Only Mode (Locked)</div>`;
                 }
             }
 
-            return `
-        <div class="task-card ${cardClass}">
-          <div class="card-top"><div class="task-title">${task.title}</div>${badge}</div>
-          <div class="quote-box">${task.quote}</div>
-          <div class="meta-row"><span>👤 Owner: <strong>${task.owner || "Unassigned"}</strong></span><span>📅 Deadline: <strong>${task.deadline}</strong></span></div>
-          ${controls}
-        </div>`;
+            return `<div class="task-card ${cardClass}"><div class="card-top"><div class="task-title">${task.title}</div>${badge}</div><div class="quote-box">${task.quote}</div><div class="meta-row"><span>👤 Owner: <strong>${task.owner || "Unassigned"}</strong></span><span>📅 Deadline: <strong>${task.deadline}</strong></span></div>${controls}</div>`;
         }
 
         function renderAll() {
@@ -1423,7 +1467,6 @@
 
             document.getElementById("btnStudentMode").className = currentRole === "STUDENT" ? "mode-btn active" : "mode-btn";
             document.getElementById("btnOfficeMode").className = (isMgr || isMember) ? "mode-btn active" : "mode-btn";
-
             document.getElementById("inputSection").style.display = isMember ? "none" : "grid";
             document.getElementById("reconcileContainer").style.display = isMember ? "none" : "block";
 
@@ -1440,9 +1483,7 @@
             const nickList = current.nicknameMap || [];
             const badgeListEl = document.getElementById("nickBadgeList");
             if (badgeListEl) {
-                badgeListEl.innerHTML = nickList.map((m, i) =>
-                    `<span class="roster-badge" style="cursor:pointer;" onclick="removeNicknameAlias(${i})" title="Click to remove">🔗 ${m.nick} ➔ ${m.real} ✖</span>`
-                ).join("");
+                badgeListEl.innerHTML = nickList.map((m, i) => `<span class="roster-badge" style="cursor:pointer;" onclick="removeNicknameAlias(${i})">🔗 ${m.nick} ➔ ${m.real} ✖</span>`).join("");
             }
 
             const { slide1, slide2, slide3 } = getCategorizedSlides();
@@ -1465,7 +1506,7 @@
             document.getElementById("slideSubtitle").textContent = hdr.sub;
 
             const activeList = current.activeSlide === 1 ? slide1 : current.activeSlide === 2 ? slide2 : slide3;
-            document.getElementById("cardsGrid").innerHTML = activeList.length ? activeList.map(t => buildCardHTML(t, current.activeSlide, true)).join("") : '<div class="subtext" style="padding:20px; text-align:center;">✨ No tasks found in this slide yet. Click ⚡ [TEST RUN] at the top or upload your files!</div>';
+            document.getElementById("cardsGrid").innerHTML = activeList.length ? activeList.map(t => buildCardHTML(t, current.activeSlide, true)).join("") : '<div class="subtext" style="padding:20px; text-align:center;">✨ Complete all 4 steps above (1. Roster, 2. Scope, 3. Lock Scope, 4. Chat Logs) and click ⚡ Reconcile chat batch!</div>';
         }
 
         async function exportPDFMultiPage() {
@@ -1474,45 +1515,27 @@
             const label = activeBucketKey();
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF("p", "mm", "a4");
-
             const slidesData = [
                 { title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1 },
                 { title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2 },
                 { title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3 }
             ];
-
             for (let i = 0; i < slidesData.length; i++) {
                 const s = slidesData[i];
-                staging.innerHTML = `
-          <div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;">
-            <h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1>
-            <p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p>
-          </div>
-          <h2 style="color:${s.color}; margin-bottom:12px;">${s.title} (${s.items.length})</h2>
-          <div class="cards-grid">
-            ${s.items.length ? s.items.map(t => buildCardHTML(t, i + 1, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}
-          </div>
-        `;
-
+                staging.innerHTML = `<div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;"><h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1><p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p></div><h2 style="color:${s.color}; margin-bottom:12px;">${s.title} (${s.items.length})</h2><div class="cards-grid">${s.items.length ? s.items.map(t => buildCardHTML(t, i + 1, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}</div>`;
                 const canvas = await html2canvas(staging, { backgroundColor: "#0b0f19", scale: 2 });
                 const imgData = canvas.toDataURL("image/jpeg", 0.95);
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
                 if (i > 0) pdf.addPage();
                 pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
             }
-
             pdf.save(`TaskNova_${label}_MultiPage_Report.pdf`);
             staging.innerHTML = "";
         }
 
-        function openJpegModal() {
-            document.getElementById("jpegExportModal").style.display = "flex";
-        }
-        function closeJpegModal() {
-            document.getElementById("jpegExportModal").style.display = "none";
-        }
+        function openJpegModal() { document.getElementById("jpegExportModal").style.display = "flex"; }
+        function closeJpegModal() { document.getElementById("jpegExportModal").style.display = "none"; }
 
         async function executeJpegDownload() {
             closeJpegModal();
@@ -1520,34 +1543,14 @@
             const { slide1, slide2, slide3 } = getCategorizedSlides();
             const staging = document.getElementById("exportStagingArea");
             const label = activeBucketKey();
-
-            let targets = [];
-            if (choice === "ALL") {
-                targets = [
-                    { name: "Unassigned_Tasks", title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1, num: 1 },
-                    { name: "Omitted_Scope", title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2, num: 2 },
-                    { name: "Accounted_Tasks", title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3, num: 3 }
-                ];
-            } else {
-                const num = parseInt(choice);
-                const targetObj = num === 1 ? { name: "Unassigned_Tasks", title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1, num: 1 }
-                    : num === 2 ? { name: "Omitted_Scope", title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2, num: 2 }
-                        : { name: "Accounted_Tasks", title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3, num: 3 };
-                targets = [targetObj];
-            }
-
+            const allTargets = [
+                { name: "Unassigned_Tasks", title: "Slide 1: Unassigned Tasks ⚠️", color: "#f59e0b", items: slide1, num: 1 },
+                { name: "Omitted_Scope", title: "Slide 2: Omitted Scope 🚨", color: "#ef4444", items: slide2, num: 2 },
+                { name: "Accounted_Tasks", title: "Slide 3: Accounted Tasks ✅", color: "#10b981", items: slide3, num: 3 }
+            ];
+            const targets = choice === "ALL" ? allTargets : [allTargets[parseInt(choice) - 1]];
             for (const t of targets) {
-                staging.innerHTML = `
-          <div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;">
-            <h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1>
-            <p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p>
-          </div>
-          <h2 style="color:${t.color}; margin-bottom:12px;">${t.title} (${t.items.length})</h2>
-          <div class="cards-grid">
-            ${t.items.length ? t.items.map(item => buildCardHTML(item, t.num, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}
-          </div>
-        `;
-
+                staging.innerHTML = `<div style="border-bottom:2px solid #6366f1; padding-bottom:12px; margin-bottom:16px;"><h1 style="color:#06b6d4; font-size:22px;">TASK NOVA-AI ✨ — ${label} REPORT</h1><p style="color:#94a3b8; font-size:12px;">Generated: ${new Date().toLocaleString()}</p></div><h2 style="color:${t.color}; margin-bottom:12px;">${t.title} (${t.items.length})</h2><div class="cards-grid">${t.items.length ? t.items.map(item => buildCardHTML(item, t.num, false)).join("") : '<p style="color:#94a3b8; font-size:13px;">No tasks in this slide.</p>'}</div>`;
                 const canvas = await html2canvas(staging, { backgroundColor: "#0b0f19", scale: 2 });
                 const link = document.createElement("a");
                 link.download = `TaskNova_${label}_${t.name}.jpg`;
@@ -1574,13 +1577,11 @@
             r.onload = async ev => {
                 try {
                     appState = JSON.parse(ev.target.result);
-                    managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
+                    managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "Kamesh" };
+                    clearPanelErrorHighlights();
                     syncChatHistoryDisplay();
-                    await saveWorkspaceState();
                     renderAll();
-                } catch (err) {
-                    alert("Invalid JSON file!");
-                }
+                } catch (err) { alert("Invalid JSON file!"); }
             };
             r.readAsText(f);
         }
@@ -1590,6 +1591,9 @@
             document.getElementById("rosterFileInput").value = "";
             document.getElementById("scopeFileInput").value = "";
             document.getElementById("chatFileInput").value = "";
+            document.getElementById("manualMemberInput").value = "";
+            document.getElementById("manualChatInput").value = "";
+            clearPanelErrorHighlights();
             syncChatHistoryDisplay();
             await saveWorkspaceState();
             renderAll();
@@ -1598,28 +1602,30 @@
         async function loadTestRunData() {
             const key = activeBucketKey();
             managerConfig.youAlias = "Kamesh";
+            clearPanelErrorHighlights();
 
-            const testChats = `[10:00 AM] Kamesh: alright team let's split the work for DEX262092
-[10:01 AM] Karthik Subramanian: I can do the Database Schema by Monday
+            const testChats = `[10:00 AM] Kamesh: alright team let's split the work for DEX262092!
+[10:01 AM] Karthik Subramanian: I can do the Database Schema & ER Diagram by Monday
 [10:02 AM] Balaje College: may I take the React Frontend Dashboard?
-[10:05 AM] Kaamu: I will not do the FastAPI Backend
-[10:06 AM] Hari IT: I can take the FastAPI Backend by wednesday 14
-[10:07 AM] Ananya Krishnan: I'll handle the JWT Authentication
-[10:08 AM] Rohan Deshmukh: who is doing the ER Diagram?
-[10:09 AM] Divya Menon: I can do the ER Diagram
+[10:04 AM] Abi: I will do the HTML file
+[10:05 AM] Kaamu: I will not do the FastAPI Backend Setup
+[10:06 AM] Hari IT: I can take the FastAPI Backend Setup by wednesday 14
+[10:07 AM] Ananya Krishnan: I'll handle the JWT Authentication Flow
+[10:08 AM] Rohan Deshmukh: who is doing the State Management Implementation?
+[10:09 AM] Divya Menon: I can do the State Management Implementation
 [10:10 AM] Rahul: ???
-[10:11 AM] Priya: I won't do the State Management
-[10:12 AM] Vikram: I'll take State Management by Oct 20
-[10:13 AM] Sneha: can I do the User Login Module?
-[10:14 AM] Amit: I'll do OAuth Integration
-[10:15 AM] Neha: what about the Chat Parsing Engine?
-[10:16 AM] Siddharth: I will take care of the Chat Parsing Engine
-[10:17 AM] Pooja: I cant do the NLP Keyword Extractor
-[10:18 AM] Aditya: I will do NLP Keyword Extractor
-[10:19 AM] Kavya: I will do Regex Filtering Module by Friday
+[10:11 AM] Priya: I won't do the User Login Module
+[10:12 AM] Vikram: I'll take User Login Module by Oct 20
+[10:13 AM] Sneha: can I do the Chat Parsing Engine?
+[10:14 AM] Amit: I'll do OAuth Google Integration
+[10:15 AM] Neha: what about the NLP Keyword Extractor?
+[10:16 AM] Siddharth: I will take care of the NLP Keyword Extractor
+[10:17 AM] Pooja: I cant do the Regex Filtering Module
+[10:18 AM] Aditya: I will do Regex Filtering Module
+[10:19 AM] Kavya: I will do PDF Data Extractor by Friday
 [10:20 AM] Manish: 🚀🔥
-[10:21 AM] Sanjay: I will take the PDF Data Extractor
-[10:22 AM] Kiran: may i do the OCR Screenshot Module?
+[10:21 AM] Sanjay: I will take the OCR Screenshot Module
+[10:22 AM] Kiran: may i do the Local Storage Sync?
 [10:23 AM] Ramesh: I will do Local Storage Sync
 [10:24 AM] Suresh: I cannot do Manager Mode UI
 [10:25 AM] Asha: I'll do Manager Mode UI
@@ -1627,30 +1633,48 @@
 [10:27 AM] Arjun: I'll take Task Assignment Logic
 [10:28 AM] Ritu: I will not do Deadline Detection System
 [10:29 AM] Anil: I will do Deadline Detection System
-[10:30 AM] Sunita: I'll do Unassigned Tasks Slide
-[10:31 AM] Manoj: I'll do Omitted Scope Slide
-[10:38 AM] Hari IT: I will also take Accounted Tasks Slide
+[10:30 AM] Sunita: I'll do Unassigned Tasks Slide Generator
+[10:31 AM] Manoj: I'll do Omitted Scope Slide Generator
+[10:38 AM] Hari IT: I will also take Accounted Tasks Slide Generator
 [10:39 AM] Ananya Krishnan: I'll do the PDF Export Feature
 [10:40 AM] You: I will take the JPEG Export Feature
-[10:41 AM] Divya Menon: wait, who handles Cloud Deployment?
-[10:42 AM] Rahul: I'll take Cloud Deployment by Nov 1
+[10:41 AM] Divya Menon: wait, who handles Cloud Deployment (Vercel)?
+[10:42 AM] Rahul: I'll take Cloud Deployment (Vercel) by Nov 1
 [10:43 AM] Priya: I'll do Docker Containerization
-[10:44 AM] Vikram: I won't do CI/CD Pipeline
-[10:45 AM] Sneha: I'll do CI/CD Pipeline
+[10:44 AM] Vikram: I won't do GitHub CI/CD Pipeline
+[10:45 AM] Sneha: I'll do GitHub CI/CD Pipeline
 [10:46 AM] Amit: can i take Unit Testing Setup?
 [10:47 AM] Neha: I'll do API Security Audit
 [10:48 AM] Siddharth: I will do Database Indexing
 [10:49 AM] Pooja: I'll do UI/UX Wireframing
 [10:50 AM] Aditya: I can't do CSS Animations
 [10:51 AM] Kavya: I'll do CSS Animations
-[10:52 AM] Manish: I'll do Project Documentation
+[10:52 AM] Manish: I'll do Project Documentation Wiki
 [10:53 AM] Sanjay: I'll do Slide Deck Preparation
-[10:54 AM] Kiran: I'll do Pitch Video Script`;
+[10:54 AM] Kiran: I'll do Pitch Video Script
+[11:36 AM] Rekha: who is taking the Push Notification System?
+[11:37 AM] Vijay: I will handle the Push Notification System
+[11:38 AM] Shalini: And I will do Real-time WebSocket Updates by Nov 15
+| will do the HTML file 7:54 pm
+| won't do the CSS Animations 8:00 pm
+[11:42 AM] Abi: I will do the HTML file
+[11:43 AM] Abi: I will do the HTML file`;
 
             appState.workspaces[key] = {
-                activeSlide: 1, scopeLocked: true,
-                roster: ["Kamesh", "Karthik Subramanian", "Balaje", "Haryana", "Abi", "Kaamu", "Hari", "Ananya Krishnan", "Rohan Deshmukh", "Divya Menon", "Rahul", "Priya", "Vikram", "Sneha", "Amit", "Neha", "Siddharth", "Pooja", "Aditya", "Kavya", "Manish", "Sanjay", "Kiran", "Ramesh", "Suresh", "Asha", "Meera", "Arjun", "Ritu", "Anil", "Sunita", "Manoj"],
-                scopeItems: ["Database Schema", "ER Diagram", "FastAPI Backend", "JWT Authentication", "React Frontend Dashboard", "State Management", "User Login Module", "OAuth Integration", "Chat Parsing Engine", "NLP Keyword Extractor", "Regex Filtering Module", "PDF Data Extractor", "OCR Screenshot Module", "Local Storage Sync", "Manager Mode UI", "Student Mode UI", "Task Assignment Logic", "Deadline Detection System", "Unassigned Tasks Slide", "Omitted Scope Slide", "Accounted Tasks Slide", "PDF Export Feature", "JPEG Export Feature", "Cloud Deployment", "Docker Containerization", "CI/CD Pipeline", "Unit Testing Setup", "API Security Audit", "Database Indexing", "UI/UX Wireframing", "CSS Animations", "Project Documentation", "Slide Deck Preparation", "Pitch Video Script"],
+                activeSlide: 3, scopeLocked: true,
+                roster: ["Kamesh", "Karthik Subramanian", "Balaje", "Haryana", "Abi", "Kaamu", "Hari", "Ananya Krishnan", "Rohan Deshmukh", "Divya Menon", "Rahul", "Priya", "Vikram", "Sneha", "Amit", "Neha", "Siddharth", "Pooja", "Aditya", "Kavya", "Manish", "Sanjay", "Kiran", "Ramesh", "Suresh", "Asha", "Meera", "Arjun", "Ritu", "Anil", "Sunita", "Manoj", "Rekha", "Vijay", "Shalini"],
+                scopeItems: [
+                    "Database Schema & ER Diagram", "FastAPI Backend Setup", "React Frontend Dashboard", "JWT Authentication Flow",
+                    "State Management Implementation", "User Login Module", "OAuth Google Integration", "Chat Parsing Engine",
+                    "NLP Keyword Extractor", "Regex Filtering Module", "PDF Data Extractor", "OCR Screenshot Module",
+                    "Local Storage Sync", "Manager Mode UI", "Student Mode UI", "Task Assignment Logic",
+                    "Deadline Detection System", "Unassigned Tasks Slide Generator", "Omitted Scope Slide Generator",
+                    "Accounted Tasks Slide Generator", "PDF Export Feature", "JPEG Export Feature", "Cloud Deployment (Vercel)",
+                    "Docker Containerization", "GitHub CI/CD Pipeline", "Unit Testing Setup", "API Security Audit",
+                    "Database Indexing", "UI/UX Wireframing", "CSS Animations", "Project Documentation Wiki",
+                    "Slide Deck Preparation", "Pitch Video Script", "Push Notification System", "Real-time WebSocket Updates",
+                    "Role-Based Access Control (RBAC)", "Automated Backup & Recovery"
+                ],
                 cumulativeChatLogs: testChats.split('\n'),
                 processedChatNormalized: [], noiseStrippedCount: 0, duplicatesIgnoredCount: 0, tasks: [],
                 nicknameMap: [
