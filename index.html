@@ -667,7 +667,7 @@
                 placeholder="1. Database Schema & ER Diagram&#10;2. FastAPI Backend & JWT API..."></textarea>
         </div>
 
-        <!-- Card 3: Chat Logs (Exact Sketch Match: Description Box, Choose File, Type + Add to chats Button, Chat History Box + Clear History Button) -->
+        <!-- Card 3: Chat Logs -->
         <div class="panel">
             <div class="panel-title">
                 <span>💬 3. Chat Logs</span>
@@ -757,7 +757,7 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         }
 
-        let currentRole = "STUDENT"; // "STUDENT" | "OFFICE_MANAGER" | "OFFICE_MEMBER"
+        let currentRole = "STUDENT";
         let managerConfig = { name: "", password: "" };
 
         function createEmptyWorkspace() {
@@ -1100,14 +1100,31 @@
                 let sender = "", msg = body;
                 if (body.includes(":")) { sender = body.split(":")[0].trim(); msg = body.split(":").slice(1).join(":").trim(); }
 
-                const owner = current.roster.find(r => r.toLowerCase().includes(sender.toLowerCase())) || "";
-                const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
+                // FIX 1: Match the first 4 letters of a name (connects "balaji" to "Balaje")
+                const owner = current.roster.find(r => r.toLowerCase().slice(0, 4) === sender.toLowerCase().slice(0, 4)) || "";
+
+                // FIX 2: Require a number after "may" so "may I" is ignored
+                const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|may\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
                 const deadline = dlMatch ? dlMatch[0].replace(/^by\s+/i, "").trim() : "Missing Deadline";
 
                 let matchedScope = null;
                 for (const s of current.scopeItems) {
-                    if (s.toLowerCase().split(/\s+/).some(w => w.length > 3 && msg.toLowerCase().includes(w))) { matchedScope = s; break; }
+                    if (msg.toLowerCase().includes(s.toLowerCase())) {
+                        matchedScope = s;
+                        break;
+                    }
                 }
+                if (!matchedScope) {
+                    for (const s of current.scopeItems) {
+                        if (s.toLowerCase().split(/\s+/).some(w => w.length > 4 && msg.toLowerCase().includes(w))) {
+                            matchedScope = s;
+                            break;
+                        }
+                    }
+                }
+
+                // FIX 3: Ignore out-of-scope chatter under 20 chars OR starting with agreement words
+                if (!matchedScope && (msg.length < 20 || /^(yes|no|ok|sure|thanks|agree)\b/i.test(msg))) return;
 
                 const title = matchedScope || msg.slice(0, 68);
                 const idx = current.tasks.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
