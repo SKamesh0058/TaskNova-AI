@@ -559,8 +559,8 @@
             <div style="display:flex; gap:10px; margin-top:6px;">
                 <button class="btn btn-primary" style="flex:1; padding:12px;" onclick="selectOfficeRole('MANAGER')">👑
                     Manager</button>
-                <button class="btn" style="flex:1; padding:12px;" onclick="selectOfficeRole('MEMBER')">👥 Team Member
-                </button>
+                <button class="btn" style="flex:1; padding:12px;" onclick="selectOfficeRole('MEMBER')">👥 Team
+                    Member</button>
             </div>
             <button class="btn" style="margin-top:4px;" onclick="closeOfficeRoleModal()">Cancel</button>
         </div>
@@ -674,15 +674,17 @@
                 <span>💬 3. Chat Logs</span>
                 <span class="subtext">txt / word / screenshot</span>
             </div>
-            <div class="instruction-box">
-                💡 <strong>AI Chat Memory & OCR:</strong> Upload `.txt`, `.docx`, or chat screenshots, or type below.
-                Strips emojis, ignores duplicates & backs up all chats.
+            <div class="instruction-box" style="margin-bottom: 4px;">
+                💡 <strong>WhatsApp Fix:</strong> Map "You" or custom contact names directly to roster members!
             </div>
+
+            <input type="text" id="youAliasInput" placeholder="If chats say 'You', who is it? (e.g. Kamesh)"
+                onchange="updateYouAlias()" style="margin-bottom:8px; border-color: var(--amber);" />
 
             <input type="file" id="chatFileInput" accept=".txt,.docx,.png,.jpg,.jpeg,.webp" multiple
                 onchange="handleChatFileUpload(event)" />
 
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; margin-top: 4px;">
                 <textarea id="manualChatInput" placeholder="Type chat message (Shift+Enter for new line)"
                     style="min-height: 40px; padding-top: 10px; resize: vertical;"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); addManualChat(); }"></textarea>
@@ -690,7 +692,7 @@
                     chats</button>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="display:flex; flex-direction:column; gap:5px; margin-top: 4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span class="subtext" style="font-weight:700; color:var(--cyan);">Chat history</span>
                     <div style="display:flex; gap:8px; align-items:center;">
@@ -760,7 +762,7 @@
         }
 
         let currentRole = "STUDENT";
-        let managerConfig = { name: "", password: "" };
+        let managerConfig = { name: "", password: "", youAlias: "" };
 
         function createEmptyWorkspace() {
             return {
@@ -782,7 +784,7 @@
                 STUDENT: createEmptyWorkspace(),
                 OFFICE: createEmptyWorkspace()
             },
-            managerConfig: { name: "", password: "" }
+            managerConfig: { name: "", password: "", youAlias: "" }
         };
 
         function activeBucketKey() {
@@ -801,7 +803,7 @@
                     if (p && p.workspaces) appState = p;
                 } catch (e) { }
             }
-            managerConfig = appState.managerConfig || { name: "", password: "" };
+            managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
             syncChatHistoryDisplay();
             renderAll();
         });
@@ -810,7 +812,7 @@
             if (event.key === "tasknova_standalone_v1" && event.newValue) {
                 try {
                     appState = JSON.parse(event.newValue);
-                    managerConfig = appState.managerConfig || { name: "", password: "" };
+                    managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
                     syncChatHistoryDisplay();
                     renderAll();
                 } catch (e) { }
@@ -826,6 +828,11 @@
             currentRole = role;
             syncChatHistoryDisplay();
             renderAll();
+        }
+
+        function updateYouAlias() {
+            managerConfig.youAlias = document.getElementById("youAliasInput").value.trim();
+            saveWorkspaceState();
         }
 
         function openOfficeRoleModal() {
@@ -877,7 +884,7 @@
                 const name = document.getElementById("mgrSetupName").value.trim();
                 const pass = document.getElementById("mgrSetupPass").value.trim();
                 if (!name || !pass) { alert("Please enter both manager name and password."); return; }
-                managerConfig = { name, password: pass };
+                managerConfig = { name, password: pass, youAlias: managerConfig.youAlias || "" };
                 saveWorkspaceState();
                 closeManagerAuthModal();
                 currentRole = "OFFICE_MANAGER";
@@ -911,6 +918,11 @@
             if (historyBox) {
                 historyBox.value = (current.cumulativeChatLogs || []).join("\n");
             }
+
+            const aliasInput = document.getElementById("youAliasInput");
+            if (aliasInput && managerConfig.youAlias !== undefined) {
+                aliasInput.value = managerConfig.youAlias;
+            }
         }
 
         async function extractLinesFromPDF(file) {
@@ -926,14 +938,12 @@
         }
 
         function cleanRosterStrings(rawList) {
-            // Enhanced filter to block PDF headers, long sentences, and column titles
             const ignoreRegex = /\b(serial|register|admission|name|id|sno|sl no|dob|birth|dexathon|roster|confidential|page|ignoring)\b/i;
             const cleaned = [];
 
             rawList.forEach(item => {
                 String(item).split(/[,|\t\n]/).forEach(part => {
                     let text = part.replace(/\b\d+[A-Za-z]+\d+\b/g, "").replace(/\d+/g, "").replace(/[^A-Za-z\s\.]/g, "").trim();
-                    // Must be between 3 and 25 characters, and not contain any forbidden words
                     if (text.length >= 3 && text.length <= 25 && !ignoreRegex.test(text)) {
                         cleaned.push(text);
                     }
@@ -968,7 +978,6 @@
             const input = document.getElementById("manualMemberInput");
             const text = input.value.trim();
             if (!text) return;
-            // Support multi-line pastes for names
             const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
             const cleaned = cleanRosterStrings(lines);
             if (cleaned.length) {
@@ -980,11 +989,11 @@
         }
 
         function cleanScopeLines(rawLines) {
-            const ignore = new Set(["scope", "deliverables", "task", "tasks", "s.no", "item"]);
+            const ignoreRegex = /\b(scope|deliverables|task|tasks|s\.no|item|dex262092|page|project)\b/i;
             const cleaned = [];
             rawLines.forEach(line => {
                 let text = String(line).replace(/^[\d]+[\.\)\-\:]\s*/, "").replace(/^[•\-\*]\s*/, "").trim();
-                if (text.length >= 4 && !ignore.has(text.toLowerCase())) cleaned.push(text);
+                if (text.length >= 4 && !ignoreRegex.test(text)) cleaned.push(text);
             });
             return [...new Set(cleaned)];
         }
@@ -1030,7 +1039,6 @@
             const current = ws();
             if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
 
-            // Allow pasting multiple chat lines at once
             const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
             current.cumulativeChatLogs.push(...lines);
 
@@ -1110,7 +1118,10 @@
                 const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu;
                 const matches = line.match(emojiRegex);
                 const clean = line.replace(emojiRegex, "").trim();
-                const body = clean.replace(/^\[.*?\]\s*/, "").trim();
+
+                // OCR CLEANUP: Fix Tesseract reading 'I' as '|' and remove time stamps like "7:54 pm" at the end
+                let body = clean.replace(/^\[.*?\]\s*/, "").replace(/^\|\s*/g, "I ").replace(/\b\d{1,2}:\d{2}\s*[ap]m\b/gi, "").trim();
+
                 const norm = body.toLowerCase();
 
                 if (current.processedChatNormalized.includes(norm)) { current.duplicatesIgnoredCount++; return; }
@@ -1118,12 +1129,23 @@
                 if (matches) current.noiseStrippedCount += matches.length;
 
                 let sender = "", msg = body;
-                if (body.includes(":")) { sender = body.split(":")[0].trim(); msg = body.split(":").slice(1).join(":").trim(); }
+                if (body.includes(":")) {
+                    sender = body.split(":")[0].trim();
+                    msg = body.split(":").slice(1).join(":").trim();
+                }
 
-                // FIX 1: Match the first 4 letters of a name (connects "balaji" to "Balaje")
-                const owner = current.roster.find(r => r.toLowerCase().slice(0, 4) === sender.toLowerCase().slice(0, 4)) || "";
+                // NEW: WhatsApp "You" Mapper
+                const youAlias = document.getElementById("youAliasInput") ? document.getElementById("youAliasInput").value.trim() : "";
+                if ((sender.toLowerCase() === "you" || sender.toLowerCase() === "me") && youAlias) {
+                    sender = youAlias;
+                }
 
-                // FIX 2: Require a number after "may" so "may I" is ignored
+                // UPGRADED: Smarter Roster Matching (maps "Karthik Bro" to "Karthik")
+                const owner = current.roster.find(r =>
+                    sender.toLowerCase().includes(r.toLowerCase()) ||
+                    r.toLowerCase().slice(0, 4) === sender.toLowerCase().slice(0, 4)
+                ) || "";
+
                 const dlMatch = msg.match(/\b(by\s+)?((monday|tuesday|wednesday|thursday|friday|saturday|sunday|oct|nov|dec|jan|feb|mar|apr|jun|jul|aug|sep)[a-z]*\s*\d{0,2}|may\s+\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
                 const deadline = dlMatch ? dlMatch[0].replace(/^by\s+/i, "").trim() : "Missing Deadline";
 
@@ -1143,15 +1165,17 @@
                     }
                 }
 
-                // FIX 3: Ignore out-of-scope chatter under 20 chars OR starting with agreement words
                 if (!matchedScope && (msg.length < 20 || /^(yes|no|ok|sure|thanks|agree)\b/i.test(msg))) return;
 
                 const title = matchedScope || msg.slice(0, 68);
                 const idx = current.tasks.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
+
+                const isDeclinedOrAsking = /\b(unassigned|need someone|who handles|who is doing|may i|can i|can't|cant|cannot|won't|wont|will not|not me)\b/i.test(msg);
+
                 const taskObj = {
                     id: idx >= 0 ? current.tasks[idx].id : "t_" + Math.random().toString(36).slice(2, 6),
                     title: title, inScope: Boolean(matchedScope), mentionedInChat: true,
-                    owner: /\b(unassigned|need someone|who handles|who is doing|may i|can i)\b/i.test(msg) ? "" : owner,
+                    owner: isDeclinedOrAsking ? "" : owner,
                     deadline: deadline, quote: `"${msg}" — ${sender || "Chat"}`, source: "CHAT"
                 };
 
@@ -1375,7 +1399,7 @@
             r.onload = async ev => {
                 try {
                     appState = JSON.parse(ev.target.result);
-                    managerConfig = appState.managerConfig || { name: "", password: "" };
+                    managerConfig = appState.managerConfig || { name: "", password: "", youAlias: "" };
                     syncChatHistoryDisplay();
                     await saveWorkspaceState();
                     renderAll();
