@@ -643,8 +643,9 @@
             <input type="file" id="rosterFileInput" accept=".xlsx,.xls,.csv,.docx,.pdf,.txt"
                 onchange="handleRosterUpload(event)" />
             <div style="display:flex; gap:6px;">
-                <input type="text" id="manualMemberInput" placeholder="Or type individual name here..."
-                    onkeydown="if(event.key==='Enter') addManualMember()" />
+                <textarea id="manualMemberInput" placeholder="Type name (Shift+Enter for new line)"
+                    style="min-height: 40px; padding-top: 10px; resize: vertical;"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); addManualMember(); }"></textarea>
                 <button class="btn" onclick="addManualMember()">Add ➕</button>
             </div>
             <div id="rosterBadges" class="badge-list"></div>
@@ -682,8 +683,9 @@
                 onchange="handleChatFileUpload(event)" />
 
             <div style="display:flex; gap:6px;">
-                <input type="text" id="manualChatInput" placeholder="Type chat message..."
-                    onkeydown="if(event.key==='Enter') addManualChat()" />
+                <textarea id="manualChatInput" placeholder="Type chat message (Shift+Enter for new line)"
+                    style="min-height: 40px; padding-top: 10px; resize: vertical;"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); addManualChat(); }"></textarea>
                 <button class="btn btn-primary" style="white-space:nowrap;" onclick="addManualChat()">Add to
                     chats</button>
             </div>
@@ -959,8 +961,17 @@
 
         async function addManualMember() {
             const input = document.getElementById("manualMemberInput");
-            const cleaned = cleanRosterStrings([input.value]);
-            if (cleaned.length) { ws().roster = [...new Set([...ws().roster, ...cleaned])]; input.value = ""; await saveWorkspaceState(); renderAll(); }
+            const text = input.value.trim();
+            if (!text) return;
+            // Support multi-line pastes for names
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+            const cleaned = cleanRosterStrings(lines);
+            if (cleaned.length) {
+                ws().roster = [...new Set([...ws().roster, ...cleaned])];
+                input.value = "";
+                await saveWorkspaceState();
+                renderAll();
+            }
         }
 
         function cleanScopeLines(rawLines) {
@@ -1013,7 +1024,11 @@
             if (!text) return;
             const current = ws();
             if (!current.cumulativeChatLogs) current.cumulativeChatLogs = [];
-            current.cumulativeChatLogs.push(text);
+
+            // Allow pasting multiple chat lines at once
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+            current.cumulativeChatLogs.push(...lines);
+
             input.value = "";
             syncChatHistoryDisplay();
             await saveWorkspaceState();
