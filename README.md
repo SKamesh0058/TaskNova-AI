@@ -1,42 +1,47 @@
-# TaskNova-AI
-
-
-A conversation-based coordination assistant that converts messy team chats and project scopes into structured, accountable action cards.
-
----
-
-### Key Features
-- **Zero-Login Standalone App:** 100% client-side web application deployed on GitHub Pages, running instantly on any laptop or mobile browser with zero login walls or server setups.
-- **Dual-Mode Workspace:** Switch seamlessly between Student Mode and Office Mode (featuring manager password protection and team member view-only mode) with full roster visibility.
-- **Persistent Scope & Iterative Chats:** Save a permanent master project scope with a built-in edit option while adding new chat transcripts any number of times.
-- **Smart Roster & Document Parsing:** Automatically extracts clean team member names from Excel, Word, PDF, or CSV files while ignoring register numbers, admission dates, and serial numbers.
-- **Browser OCR & Chat Memory:** Upload `.txt`, `.docx`, or chat screenshots for instant browser-based OCR, manual chat typing with `[Add to chats]`, persistent scrollable history, and a dedicated `🗑️ Clear History` button.
-- **Emoji & Duplicate Filtering:** Automatically ignores emojis, casual filler, and repeated chat messages so nothing gets processed twice.
-- **Verbatim Quote Tracing:** Every generated card cites the exact chat message for complete accountability.
-- **Risk Detection:** Automatically flags unassigned roles, missing deadlines, and ambiguous tasks.
-- **Multi-Slide Action Board & Export:** Interactive 3-slide dashboard (Unassigned Tasks, Omitted Scope, and Accounted Tasks) with multi-page PDF and selectable JPEG exports.
+# 🚀 TaskNova-AI ✨
+> AI & Machine Learning)**    
+> *Transforming chaotic team chats, messy rosters, and project scopes into structured, actionable management slides — 100% in the browser.*
 
 ---
 
-### Architecture & Pipeline
-1. **Input:** Master project scope, team roster, and raw chat transcripts/screenshots ingested via the browser dashboard.
-2. **Processing:** Browser engine strips out emojis and duplicate messages while parsing document uploads and matching chat commitments against the project scope.
-3. **Validation:** Heuristic check enforces structured outputs and identifies missing assignees and tentative dates.
-4. **Output:** Rendered as an interactive 3-slide action board saved locally in the browser with instant multi-page PDF and JPEG download options.
+## 📖 The Problem
+Every hackathon or sprint team knows the pain: you spend hours arguing over who is building what in a chaotic WhatsApp or Slack group. At the end of the day, key deliverables get **omitted**, tasks remain **unassigned**, and tracking accountability becomes a administrative nightmare. 
+
+**TaskNova-AI** solves this by acting as an intelligent, automated project management mediator.
 
 ---
 
-### Tech Stack
-- **Core Engine:** Automated Intent Extraction & Browser OCR (Tesseract.js, PDF.js, Mammoth, XLSX)
-- **Deployment:** GitHub Pages (Zero-Server Standalone Architecture)
-- **Frontend:** Responsive Web Interface (HTML5, CSS3, JavaScript, LocalStorage, jsPDF, html2canvas)
+## ✨ What is TaskNova-AI?
+TaskNova-AI is a **100% client-side, standalone web prototype** built with zero backend dependencies. It ingests messy multi-format inputs (Excel sheets, Word docs, PDFs, chat transcripts, and screenshots) and uses custom heuristic parsing and natural language intent matching to instantly categorize project tasks into 3 management slides:
+
+1. ⚠️ **Slide 1 (Unassigned Tasks):** Tasks discussed in chat that lack a confirmed owner.
+2. 🚨 **Slide 2 (Omitted Scope):** Core project deliverables defined in your baseline scope with zero mentions in chat.
+3. ✅ **Slide 3 (Accounted Tasks):** Verified tasks successfully assigned to team members, complete with extracted quotes and deadlines.
 
 ---
 
-### Contributors
-- @SKamesh0058
-- @mithuhere26-ops
-- @harshu121526
-- @abinav277
-- @Inykaash
-- @KarthikBalaje6212
+## 🛠️ Architecture & Tech Stack
+
+TaskNova packs heavy backend-level document processing capabilities directly into the browser:
+
+* **Frontend Engine:** Vanilla ES6+, CSS3 (Glassmorphism UI, Responsive Grid System).
+* **Document & Spreadsheet Parsers:** SheetJS (`xlsx`) & Mammoth.js (`docx`).
+* **PDF Rendering Engine:** Mozilla PDF.js (`pdf.js`) with visual coordinate row-grouping to preserve table integrity.
+* **OCR / Computer Vision:** Tesseract.js for extracting text streams directly from chat screenshots (`.png`, `.jpg`).
+* **Report Generation:** html2canvas & jsPDF for instant multi-page PDF and high-res JPEG reporting.
+
+---
+
+## ⚡ Core Engineering Highlights
+
+* **Smart Roster Sanitization:** Automatically purges administrative noise (Serial numbers, Admission dates, and DEX registration codes) to extract *only* clean team member names.
+* **Intelligent Scope & Intent Matching:** Uses a custom multi-tier matching algorithm that prevents generic words (like `"Setup"`, `"System"`, or `"Database"`) from colliding while accurately detecting task acceptance, refusals, and inquiries.
+* **Strict Pre-Reconciliation Guardrails:** Enforces a mandatory 4-step validation pipeline. The app completely blocks execution and highlights missing dependencies if Roster, Scope, Scope Lock, or Chat Logs are absent.
+* **Multi-Role Access Control:** Features dedicated views for **Student Mode** (collaborative/alias mapping) and **Office Mode** (Manager override triage vs. Team Member view-only protection).
+
+---
+
+## 🚀 Getting Started (Zero Setup Required)
+
+Because TaskNova-AI runs entirely in your browser, there is **no Node.js installation, no database configuration, and no server setup** needed!
+
